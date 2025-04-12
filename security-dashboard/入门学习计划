@@ -1,0 +1,35 @@
+# 安全大屏项目技术学习指南
+
+## 1. 项目架构概览
+本项目使用React + TypeScript + Tailwind CSS + ECharts技术栈，已完成的四个大屏分别是：
+- 平台资源大屏
+- 防护检测大屏
+- 资产监测大屏
+- 数据资产防护监测大屏
+
+## 2. 核心技术点
+
+### 2.1 React基础 (优先学习)
+```typescript
+// 示例：典型函数式组件结构
+interface PageProps {
+  activePage: string;
+}
+
+const Navigation: React.FC<PageProps> = ({ activePage }) => {
+  const [currentPage, setPage] = useState(activePage);
+  
+  return (
+    <div className="flex space-x-4">
+      {['dashboard', 'monitor'].map(page => (
+        <button 
+          key={page}
+          onClick={() => setPage(page)}
+          className={`px-4 py-2 ${currentPage === page ? 'bg-blue-500' : 'bg-gray-200'}`}
+        >
+          {page.toUpperCase()}
+        </button>
+      ))}
+    </div>
+  );
+}
