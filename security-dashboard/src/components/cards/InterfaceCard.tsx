@@ -9,7 +9,7 @@ interface InterfaceCardProps {
     label: string;
     count: number;
     percentage: number;
-    color?: string;
+    color: string;
   }[];
 }
 
@@ -21,34 +21,57 @@ const InterfaceCard: React.FC<InterfaceCardProps> = ({
   details 
 }) => {
   return (
-    <div className="bg-white p-5 rounded-lg shadow">
-      <div className="flex items-center mb-4">
-        <div className="mr-4 text-blue-500 flex-shrink-0">{icon}</div>
-        <div>
-          <div className="text-sm text-gray-500 mb-1">{title}</div>
-          <div className="text-3xl font-bold">{count.toLocaleString()}</div>
+    <div className="flex flex-col h-full">
+      <div className="flex items-start mb-4">
+        <div className="flex-shrink-0 w-10 h-10 flex items-center mr-3">
+          <div className="text-blue-500">
+            {icon}
+          </div>
+        </div>
+        
+        <div className="flex-1 min-w-0">
+          <div className="text-gray-500 text-sm mb-1">
+            {title}
+          </div>
+          <div className="text-3xl font-bold">
+            {count.toLocaleString()}
+          </div>
         </div>
       </div>
       
-      <div className="flex items-center justify-between text-sm mb-3">
-        <span className="text-gray-600">安全防护覆盖率</span>
-        <span className="font-semibold text-blue-600">{securityRate.toFixed(1)}%</span>
+      <div className="flex items-center mb-2 px-1">
+        <div className="text-xs text-gray-500 mb-1">接口分布率</div>
+        <div className="ml-auto text-blue-500 font-medium text-sm">
+          {securityRate.toFixed(1)}%
+        </div>
+      </div>
+      <div className="h-2 bg-gray-100 rounded overflow-hidden mb-4">
+        <div 
+          className="h-full bg-blue-500 rounded" 
+          style={{ width: `${securityRate}%` }}
+        ></div>
       </div>
       
       {details && details.length > 0 && (
-        <div className="text-xs space-y-2">
+        <div className="space-y-2 mt-auto">
           {details.map((detail, index) => (
-            <div key={index} className="flex items-center justify-between">
-              <div className="flex items-center">
-                <div 
-                  className="w-2 h-2 rounded-full mr-2" 
-                  style={{ backgroundColor: detail.color || '#3b82f6' }}
-                ></div>
-                <span>{detail.label}</span>
+            <div key={index} className="flex items-center text-xs">
+              <div 
+                className="w-2.5 h-2.5 mr-2 rounded-full flex-shrink-0" 
+                style={{ backgroundColor: detail.color }}
+              ></div>
+              <div className="flex-1 min-w-0">
+                <div className="text-gray-600 truncate" title={detail.label}>
+                  {detail.label}
+                </div>
               </div>
-              <div className="flex items-center">
-                <span className="mr-2">{detail.count}</span>
-                <span className="text-gray-500">{detail.percentage}%</span>
+              <div className="ml-2 whitespace-nowrap flex-shrink-0">
+                <span className="text-gray-700 font-medium">
+                  {detail.count}
+                </span>
+                <span className="text-gray-500 ml-1">
+                  ({detail.percentage}%)
+                </span>
               </div>
             </div>
           ))}

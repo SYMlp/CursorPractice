@@ -36,3 +36,47 @@
     transform: rotate(360deg);
   }
 }
+
+/* 防止内容溢出的全局样式 */
+* {
+  box-sizing: border-box;
+}
+
+/* 确保所有容器有明确的内容溢出处理 */
+.card, .bg-white, .rounded-lg, .shadow {
+  overflow: hidden;
+}
+
+/* 确保文字不会溢出其容器 */
+h1, h2, h3, h4, h5, h6, p, span, div {
+  max-width: 100%;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
+
+/* 确保数值显示不会溢出 */
+.text-lg, .text-xl, .text-2xl, .text-3xl, .text-4xl, .font-semibold, .font-bold {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* 优化图标显示 */
+svg, img {
+  max-width: 100%;
+  height: auto;
+  display: inline-block;
+  vertical-align: middle;
+}
+
+/* 紧凑布局样式 */
+.compact-layout {
+  --card-padding: 0.5rem;
+  --card-gap: 0.5rem;
+}
+
+/* 添加安全系统蓝色主题 */
+:root {
+  --security-blue: #1e40af;
+  --security-light-blue: #3b82f6;
+}

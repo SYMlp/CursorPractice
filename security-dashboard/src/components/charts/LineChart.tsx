@@ -13,14 +13,19 @@ interface LineChartProps {
   xAxisData: string[];
   series: DataSeries[];
   showLegend?: boolean;
+  height?: number;
 }
 
 const LineChart: React.FC<LineChartProps> = ({ 
   title, 
   xAxisData, 
   series, 
-  showLegend = false 
+  showLegend = false,
+  height = 250
 }) => {
+  // 预定义的颜色数组，用于没有指定颜色的系列
+  const colorPalette = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6'];
+
   const option = {
     title: {
       text: title,
@@ -29,7 +34,7 @@ const LineChart: React.FC<LineChartProps> = ({
         fontWeight: 'normal',
         color: '#334155'
       },
-      padding: [10, 10]
+      padding: [5, 5]
     },
     tooltip: {
       trigger: 'axis',
@@ -43,14 +48,19 @@ const LineChart: React.FC<LineChartProps> = ({
       show: showLegend,
       bottom: 0,
       textStyle: {
-        color: '#6b7280'
-      }
+        color: '#6b7280',
+        fontSize: 10
+      },
+      icon: 'circle',
+      itemWidth: 8,
+      itemHeight: 8,
+      padding: [2, 5]
     },
     grid: {
       left: '3%',
       right: '4%',
-      bottom: showLegend ? '10%' : '3%',
-      top: '15%',
+      bottom: showLegend ? '8%' : '3%',
+      top: title ? '12%' : '3%',
       containLabel: true
     },
     xAxis: {
@@ -63,7 +73,10 @@ const LineChart: React.FC<LineChartProps> = ({
         }
       },
       axisLabel: {
-        color: '#6b7280'
+        color: '#6b7280',
+        fontSize: 10,
+        margin: 6,
+        align: 'center'
       }
     },
     yAxis: {
@@ -72,26 +85,38 @@ const LineChart: React.FC<LineChartProps> = ({
         show: false
       },
       axisLabel: {
-        color: '#6b7280'
+        color: '#6b7280',
+        fontSize: 10,
+        margin: 6
       },
       splitLine: {
         lineStyle: {
-          color: '#e5e7eb'
+          color: '#e5e7eb',
+          type: 'dashed'
         }
       }
     },
-    series: series.map(s => ({
+    series: series.map((s, index) => ({
       name: s.name,
       type: 'line',
       data: s.data,
       symbol: 'circle',
       symbolSize: 6,
+      smooth: true,
+      showSymbol: false,
+      emphasis: {
+        scale: 1.5,
+        itemStyle: {
+          shadowBlur: 5,
+          shadowColor: 'rgba(0, 0, 0, 0.2)'
+        }
+      },
       itemStyle: {
-        color: s.color
+        color: s.color || colorPalette[index % colorPalette.length]
       },
       lineStyle: {
         width: 2,
-        color: s.color
+        color: s.color || colorPalette[index % colorPalette.length]
       },
       areaStyle: s.areaStyle ? {
         color: {
@@ -102,10 +127,10 @@ const LineChart: React.FC<LineChartProps> = ({
           y2: 1,
           colorStops: [{
             offset: 0, 
-            color: s.color ? s.color.replace(')', ', 0.3)').replace('rgb', 'rgba') : 'rgba(59, 130, 246, 0.3)'
+            color: (s.color || colorPalette[index % colorPalette.length]).replace(')', ', 0.3)').replace('rgb', 'rgba')
           }, {
             offset: 1, 
-            color: s.color ? s.color.replace(')', ', 0.05)').replace('rgb', 'rgba') : 'rgba(59, 130, 246, 0.05)'
+            color: (s.color || colorPalette[index % colorPalette.length]).replace(')', ', 0.05)').replace('rgb', 'rgba')
           }]
         }
       } : undefined
@@ -113,12 +138,10 @@ const LineChart: React.FC<LineChartProps> = ({
   };
 
   return (
-    <div className="bg-white p-4 rounded-lg shadow">
-      <ReactECharts 
-        option={option} 
-        style={{ height: '250px', width: '100%' }} 
-      />
-    </div>
+    <ReactECharts 
+      option={option} 
+      style={{ height: `${height}px`, width: '100%' }} 
+    />
   );
 };
 

@@ -9,29 +9,36 @@ interface RuleCardProps {
   color?: string;
 }
 
-const RuleCard: React.FC<RuleCardProps> = ({ 
-  icon, 
-  title, 
-  count, 
-  baseCount, 
+const RuleCard: React.FC<RuleCardProps> = ({
+  icon,
+  title,
+  count,
+  baseCount,
   todayCount,
-  color = '#3b82f6'
+  color = '#4096ff',
 }) => {
   return (
-    <div className="bg-white p-5 rounded-lg shadow">
-      <div className="flex items-center mb-3">
-        <div className="mr-4" style={{ color }}>
+    <div className="h-full bg-white border border-gray-100 rounded-lg p-4">
+      <div className="flex">
+        <div className="flex-shrink-0 text-blue-500 flex items-center mr-4">
           {icon}
         </div>
-        <div>
-          <div className="text-lg font-semibold">{count}</div>
-          <div className="text-sm text-gray-500">{title}</div>
+        
+        <div className="flex-1">
+          <div className="text-sm text-gray-500 mb-1">{title}</div>
+          <div className="text-3xl font-bold mb-3">{count}</div>
+          
+          <div className="flex justify-between mt-2 text-sm">
+            <div>
+              <div className="text-green-500">已下发</div>
+              <div>{baseCount}</div>
+            </div>
+            <div>
+              <div className="text-red-500">已撤销</div>
+              <div>{todayCount}</div>
+            </div>
+          </div>
         </div>
-      </div>
-      
-      <div className="flex text-xs text-gray-500 mt-2 justify-between">
-        <div>已下发 {baseCount}</div>
-        <div>已替换 {todayCount}</div>
       </div>
     </div>
   );

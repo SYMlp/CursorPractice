@@ -13,7 +13,8 @@ import {
   DocumentIcon, 
   CheckListIcon, 
   LayersIcon, 
-  InterfaceIcon 
+  InterfaceIcon,
+  KeyIcon
 } from './components/icons/Icons';
 import { 
   resourceManagementData, 
@@ -26,239 +27,126 @@ import {
 import InterfaceMonitoring from './pages/InterfaceMonitoring';
 import AssetMonitoring from './pages/AssetMonitoring';
 import SecurityMonitoring from './pages/SecurityMonitoring';
+import PlatformOverview from './pages/ResourceMonitoring';
+import PasswordRules from './pages/PasswordRules';
+import PasswordRuleDemo from './pages/PasswordRuleDemo';
+
+// 导入安全图标
+import securityLogo from './assets/icons/security-logo.png';
 
 function App() {
-  const [activePage, setActivePage] = useState<'resources' | 'monitoring' | 'asset' | 'security'>('resources');
+  const [activePage, setActivePage] = useState<'resources' | 'monitoring' | 'asset' | 'security' | 'password' | 'passwordDemo'>('resources');
 
   return (
     <div className="bg-gray-100 min-h-screen">
-      {/* 导航栏 */}
-      <nav className="bg-white shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between h-16">
-            <div className="flex">
+      {/* 导航栏 - 使用深蓝色背景 */}
+      <nav className="bg-blue-800 text-white shadow">
+        <div className="max-w-7xl mx-auto px-4">
+          <div className="flex justify-between h-12">
+            {/* 左侧 Logo 和系统名称 */}
+            <div className="flex items-center">
               <div className="flex-shrink-0 flex items-center">
-                <h1 className="text-xl font-bold text-gray-800">安全防护大屏</h1>
+                <img src={securityLogo} alt="安全系统" className="h-6 w-6 mr-2" />
+                <h1 className="text-lg font-bold">安全防护系统</h1>
               </div>
-              <div className="ml-6 flex space-x-8">
-                <button
-                  onClick={() => setActivePage('resources')}
-                  className={`inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium ${
-                    activePage === 'resources'
-                      ? 'border-blue-500 text-gray-900'
-                      : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
-                  }`}
-                >
-                  平台资源
-                </button>
-                <button
-                  onClick={() => setActivePage('monitoring')}
-                  className={`inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium ${
-                    activePage === 'monitoring'
-                      ? 'border-blue-500 text-gray-900'
-                      : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
-                  }`}
-                >
-                  防护检测
-                </button>
-                <button
-                  onClick={() => setActivePage('asset')}
-                  className={`inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium ${
-                    activePage === 'asset'
-                      ? 'border-blue-500 text-gray-900'
-                      : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
-                  }`}
-                >
-                  资产监测
-                </button>
-                <button
-                  onClick={() => setActivePage('security')}
-                  className={`inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium ${
-                    activePage === 'security'
-                      ? 'border-blue-500 text-gray-900'
-                      : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
-                  }`}
-                >
-                  数据资产防护
-                </button>
+            </div>
+
+            {/* 右侧用户信息和帮助入口 */}
+            <div className="flex items-center space-x-4">
+              <button className="text-white text-sm flex items-center">
+                <span>帮助中心</span>
+                <svg className="h-4 w-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+              <div className="flex items-center text-sm">
+                <svg className="h-5 w-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                </svg>
+                <span>欢迎您，sunwukongNo1</span>
               </div>
             </div>
           </div>
         </div>
       </nav>
 
-      {/* 内容区域 */}
-      {activePage === 'resources' && <ResourceDashboard />}
-      {activePage === 'monitoring' && <InterfaceMonitoring />}
-      {activePage === 'asset' && <AssetMonitoring />}
-      {activePage === 'security' && <SecurityMonitoring />}
-    </div>
-  );
-}
-
-// 资源管理大屏组件
-const ResourceDashboard: React.FC = () => {
-  return (
-    <div className="p-4">
-      <div className="max-w-7xl mx-auto">
-        <div className="grid grid-cols-1 md:grid-cols-6 gap-4 mb-4">
-          {/* 资源管理 */}
-          <div className="md:col-span-1">
-            <h2 className="text-lg font-medium mb-2 text-gray-700">资源管理</h2>
-            <ResourceCard 
-              icon={<DatabaseIcon />}
-              title="资源总量"
-              count={resourceManagementData.count}
-              metrics={resourceManagementData.metrics}
-              growthItems={resourceManagementData.growthItems}
-            />
-          </div>
-          
-          {/* 资源类型 */}
-          <div className="md:col-span-5">
-            <h2 className="text-lg font-medium mb-2 text-gray-700">资源类型</h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-4">
-              {resourceTypesData.map((item, index) => (
-                <CircularProgress 
-                  key={index}
-                  percentage={item.percentage}
-                  title={item.title}
-                  color={item.color}
-                />
-              ))}
-            </div>
-          </div>
-        </div>
-        
-        {/* 安全规则 */}
-        <div className="mb-4">
-          <h2 className="text-lg font-medium mb-2 text-gray-700">安全规则</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-4">
-            {securityRulesData.map((rule, index) => (
-              <RuleCard 
-                key={index}
-                icon={
-                  index === 0 ? <ShieldIcon color={rule.color} /> :
-                  index === 1 ? <AlertIcon color={rule.color} /> :
-                  index === 2 ? <DocumentIcon color={rule.color} /> :
-                  index === 3 ? <CheckListIcon color={rule.color} /> :
-                  <LayersIcon color={rule.color} />
-                }
-                title={rule.title}
-                count={rule.count}
-                baseCount={rule.baseCount}
-                todayCount={rule.todayCount}
-                color={rule.color}
-              />
-            ))}
-          </div>
-        </div>
-        
-        {/* 接口管理 */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-          <div className="col-span-1">
-            <h2 className="text-lg font-medium mb-2 text-gray-700">接口管理</h2>
-            <div className="grid grid-cols-1 gap-4">
-              <InterfaceCard 
-                icon={<InterfaceIcon />}
-                title="接口数总量"
-                count={interfaceManagementData.count}
-                securityRate={interfaceManagementData.securityRate}
-                details={interfaceManagementData.details}
-              />
-              <PieChart 
-                data={interfaceSecurityDistribution}
-                showPercentage={true}
-              />
-            </div>
-          </div>
-          
-          <div className="col-span-2">
-            <div className="grid grid-cols-1 gap-4">
-              <div>
-                <div className="flex justify-between items-center mb-2">
-                  <h2 className="text-lg font-medium text-gray-700">面向接口数据量</h2>
-                  <div className="flex space-x-4 text-sm text-gray-500">
-                    <button className="hover:text-blue-500">一天</button>
-                    <button className="text-blue-500">一周</button>
-                  </div>
-                </div>
-                <LineChart 
-                  title=""
-                  xAxisData={timeSeriesData.xAxisData}
-                  series={timeSeriesData.series.interfaceData}
-                  showLegend={true}
-                />
-              </div>
-              
-              <div>
-                <div className="flex justify-between items-center mb-2">
-                  <h2 className="text-lg font-medium text-gray-700">识别服务接口数据量</h2>
-                  <div className="flex space-x-4 text-sm text-gray-500">
-                    <button className="hover:text-blue-500">一天</button>
-                    <button className="text-blue-500">一周</button>
-                  </div>
-                </div>
-                <LineChart 
-                  title=""
-                  xAxisData={timeSeriesData.xAxisData}
-                  series={timeSeriesData.series.identificationData}
-                />
-              </div>
-            </div>
-          </div>
-        </div>
-        
-        {/* 服务数据量 */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div>
-            <div className="flex justify-between items-center mb-2">
-              <h2 className="text-lg font-medium text-gray-700">防护服务数据量</h2>
-              <div className="flex space-x-4 text-sm text-gray-500">
-                <button className="hover:text-blue-500">一天</button>
-                <button className="text-blue-500">一周</button>
-              </div>
-            </div>
-            <LineChart 
-              title=""
-              xAxisData={timeSeriesData.xAxisData}
-              series={timeSeriesData.series.protectionData}
-            />
-          </div>
-          
-          <div>
-            <div className="flex justify-between items-center mb-2">
-              <h2 className="text-lg font-medium text-gray-700">检测服务接口数据量</h2>
-              <div className="flex space-x-4 text-sm text-gray-500">
-                <button className="hover:text-blue-500">一天</button>
-                <button className="text-blue-500">一周</button>
-              </div>
-            </div>
-            <LineChart 
-              title=""
-              xAxisData={timeSeriesData.xAxisData}
-              series={timeSeriesData.series.detectionData}
-            />
-          </div>
-          
-          <div>
-            <div className="flex justify-between items-center mb-2">
-              <h2 className="text-lg font-medium text-gray-700">响应服务接口数据量</h2>
-              <div className="flex space-x-4 text-sm text-gray-500">
-                <button className="hover:text-blue-500">一天</button>
-                <button className="text-blue-500">一周</button>
-              </div>
-            </div>
-            <LineChart 
-              title=""
-              xAxisData={timeSeriesData.xAxisData}
-              series={timeSeriesData.series.responseData}
-            />
+      {/* 二级导航 */}
+      <div className="bg-white shadow-sm mb-1">
+        <div className="max-w-7xl mx-auto">
+          <div className="flex space-x-6 text-sm">
+            <button
+              onClick={() => setActivePage('resources')}
+              className={`py-2 px-3 ${
+                activePage === 'resources'
+                  ? 'text-blue-700 font-medium border-b-2 border-blue-500'
+                  : 'text-gray-600 hover:text-gray-900'
+              }`}
+            >
+              平台概览
+            </button>
+            <button
+              onClick={() => setActivePage('monitoring')}
+              className={`py-2 px-3 ${
+                activePage === 'monitoring'
+                  ? 'text-blue-700 font-medium border-b-2 border-blue-500'
+                  : 'text-gray-600 hover:text-gray-900'
+              }`}
+            >
+              防护检测
+            </button>
+            <button
+              onClick={() => setActivePage('asset')}
+              className={`py-2 px-3 ${
+                activePage === 'asset'
+                  ? 'text-blue-700 font-medium border-b-2 border-blue-500'
+                  : 'text-gray-600 hover:text-gray-900'
+              }`}
+            >
+              资产监测
+            </button>
+            <button
+              onClick={() => setActivePage('security')}
+              className={`py-2 px-3 ${
+                activePage === 'security'
+                  ? 'text-blue-700 font-medium border-b-2 border-blue-500'
+                  : 'text-gray-600 hover:text-gray-900'
+              }`}
+            >
+              数据资产防护
+            </button>
+            <button
+              onClick={() => setActivePage('password')}
+              className={`py-2 px-3 flex items-center ${
+                activePage === 'password'
+                  ? 'text-blue-700 font-medium border-b-2 border-blue-500'
+                  : 'text-gray-600 hover:text-gray-900'
+              }`}
+            >
+              <KeyIcon size={14} className="mr-1" /> 密码规则
+            </button>
+            <button
+              onClick={() => setActivePage('passwordDemo')}
+              className={`py-2 px-3 ${
+                activePage === 'passwordDemo'
+                  ? 'text-blue-700 font-medium border-b-2 border-blue-500'
+                  : 'text-gray-600 hover:text-gray-900'
+              }`}
+            >
+              组件演示
+            </button>
           </div>
         </div>
       </div>
+
+      {/* 内容区域 */}
+      {activePage === 'resources' && <PlatformOverview />}
+      {activePage === 'monitoring' && <InterfaceMonitoring />}
+      {activePage === 'asset' && <AssetMonitoring />}
+      {activePage === 'security' && <SecurityMonitoring />}
+      {activePage === 'password' && <PasswordRules />}
+      {activePage === 'passwordDemo' && <PasswordRuleDemo />}
     </div>
   );
-};
+}
 
 export default App;

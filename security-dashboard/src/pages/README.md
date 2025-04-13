@@ -4,11 +4,12 @@
 
 ## 文件说明
 
+- `ResourceMonitoring.tsx`: 平台概览页 (导出PlatformOverview组件)
 - `SecurityMonitoring.tsx`: 数据资产防护大屏
 - `AssetMonitoring.tsx`: 资产监测大屏
 - `InterfaceMonitoring.tsx`: 接口监控大屏
-
-> 注意：资源管理大屏组件在根目录的`App.tsx`中作为内部组件实现。
+- `PasswordRules.tsx`: 密码安全规则管理页面
+- `PasswordRuleDemo.tsx`: 密码规则组件演示页面
 
 ## 页面组件设计原则
 
@@ -18,6 +19,31 @@
 4. **一致体验**: 所有页面保持一致的设计语言和交互模式
 
 ## 页面详细说明
+
+### ResourceMonitoring.tsx (平台概览页)
+
+**功能描述**：
+安全防护系统的平台概览页，展示系统整体运行状况和关键指标。
+
+**主要区域**：
+- 资源管理：展示资源总量及增长趋势
+- 资源类型：展示不同类型资源的占比分布
+- 安全规则：展示各类安全规则的数量统计
+- 接口管理：展示接口总量和安全分布情况
+- 服务数据量：展示各类服务接口的数据量趋势
+  - 南向接口数据量
+  - 识别服务接口数据量
+  - 防护服务数据量
+  - 检测服务接口数据量
+  - 响应服务接口数据量
+
+**使用的组件**：
+- ResourceCard：展示资源总量信息
+- CircularProgress：展示资源类型百分比
+- RuleCard：展示安全规则信息
+- InterfaceCard：展示接口管理信息
+- PieChart：展示接口安全分布
+- LineChart：展示时间序列数据
 
 ### SecurityMonitoring.tsx (数据资产防护大屏)
 
@@ -77,18 +103,58 @@
 - NetworkTopology：展示网络拓扑图
 - MultiLineChart：展示多维时间序列数据
 
+### PasswordRules.tsx (密码安全规则管理)
+
+**功能描述**：
+管理和展示系统密码安全规则，包括复杂度规则、更新周期规则、历史复用规则等。
+
+**主要区域**：
+- 顶部操作按钮：提供添加、导出规则功能
+- 规则卡片概览：展示各类密码规则的统计数据
+- 规则详情表格：展示具体规则内容和操作入口
+
+**使用的组件**：
+- RuleCard：展示规则统计数据
+- 详情表格：展示规则详细信息
+- KeyIcon、ClockIcon等：表示不同类型的规则
+
+**特点**：
+- 支持多种密码规则类型的分类管理
+- 提供规则状态（启用/待审批）的直观展示
+- 可扩展的规则管理功能入口
+
+### PasswordRuleDemo.tsx (密码规则组件演示)
+
+**功能描述**：
+展示专用的PasswordRuleCard组件使用效果，演示如何利用passwordRule图标。
+
+**主要区域**：
+- 顶部说明：页面功能介绍
+- 卡片网格：展示不同状态和严重程度的密码规则卡片
+- 使用说明：组件使用方法和特点说明
+
+**使用的组件**：
+- PasswordRuleCard：专用密码规则卡片组件，使用passwordRule图标
+
+**特点**：
+- 展示不同严重程度（高/中/低）的规则样式
+- 展示规则启用/禁用状态的视觉表现
+- 演示getIcon('passwordRule')的图标映射机制
+
 ## 路由管理
 
 项目使用简单的状态管理实现页面切换，在`App.tsx`中通过状态`activePage`控制显示哪个页面：
 
 ```tsx
-const [activePage, setActivePage] = useState<'resources' | 'monitoring' | 'asset' | 'security'>('resources');
+const [activePage, setActivePage] = useState<'resources' | 'monitoring' | 'asset' | 'security' | 'password' | 'passwordDemo'>('resources');
 
 // 根据状态显示不同页面
-{activePage === 'resources' && <ResourceDashboard />}
+{activePage === 'resources' && <PlatformOverview />}
 {activePage === 'monitoring' && <InterfaceMonitoring />}
 {activePage === 'asset' && <AssetMonitoring />}
 {activePage === 'security' && <SecurityMonitoring />}
+{activePage === 'password' && <PasswordRules />}
+{activePage === 'passwordDemo' && <PasswordRuleDemo />}
 ```
 
 ## 页面扩展指南
@@ -114,4 +180,9 @@ const [activePage, setActivePage] = useState<'resources' | 'monitoring' | 'asset
 
 ## 更新记录
 
+- 2024-04-13: 优化平台概览页布局，使其更接近设计图，包括添加卡片边框、调整网格布局、优化环形进度图和折线图样式
+- 2023-12-18: 优化PlatformOverview页面布局，使其更加紧凑；修复内容溢出问题；启用真实图片图标替代SVG图标
+- 2023-12-15: 添加密码规则相关页面（PasswordRules和PasswordRuleDemo）
+- 2023-11-28: 将ResourceMonitoring重命名为PlatformOverview，更准确反映其作为平台概览页的功能
+- 2023-11-25: 将ResourceDashboard从App.tsx移至pages目录，重命名为ResourceMonitoring
 - 2023-11-01: 初始版本 

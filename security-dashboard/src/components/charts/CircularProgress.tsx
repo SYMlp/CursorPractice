@@ -12,6 +12,26 @@ const CircularProgress: React.FC<CircularProgressProps> = ({
   title,
   color = '#3b82f6' 
 }) => {
+  // 生成渐变色
+  const getGradientColor = () => {
+    // 基于传入的color创建渐变色
+    const baseColor = color;
+    const lighterColor = color; // 如果需要可以调整为更亮的颜色
+    
+    return {
+      type: 'linear',
+      x: 0,
+      y: 0,
+      x2: 0,
+      y2: 1,
+      colorStops: [{
+        offset: 0, color: lighterColor
+      }, {
+        offset: 1, color: baseColor
+      }]
+    };
+  };
+
   const option = {
     series: [
       {
@@ -27,13 +47,13 @@ const CircularProgress: React.FC<CircularProgressProps> = ({
           roundCap: true,
           clip: false,
           itemStyle: {
-            color: color
+            color: getGradientColor()
           }
         },
         axisLine: {
           lineStyle: {
             width: 10,
-            color: [[1, '#e5e7eb']]
+            color: [[1, '#e6ebf8']]
           }
         },
         splitLine: {
@@ -53,7 +73,7 @@ const CircularProgress: React.FC<CircularProgressProps> = ({
               show: false
             },
             detail: {
-              offsetCenter: ['0%', '0%']
+              show: false
             }
           }
         ],
@@ -61,24 +81,24 @@ const CircularProgress: React.FC<CircularProgressProps> = ({
           show: false
         },
         detail: {
-          width: 50,
-          height: 14,
-          fontSize: 20,
-          color: '#334155',
-          formatter: '{value}%'
+          show: false
         }
       }
     ]
   };
 
   return (
-    <div className="bg-white p-4 rounded-lg shadow">
-      <div className="text-center text-gray-500 text-sm mb-2">{title}</div>
-      <div className="flex justify-center items-center">
+    <div className="p-4 bg-white border border-gray-100 rounded-lg flex flex-col items-center">
+      <div className="text-sm text-gray-600 mb-2 text-center">{title}</div>
+      <div className="text-xs text-gray-400 mb-1">占比</div>
+      <div className="w-20 h-20 relative mb-2">
         <ReactECharts 
           option={option} 
-          style={{ height: '120px', width: '120px' }} 
+          style={{ height: '100%', width: '100%' }}
         />
+      </div>
+      <div className="text-2xl font-bold text-center" style={{ color: color }}>
+        {percentage}%
       </div>
     </div>
   );

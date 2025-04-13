@@ -12,9 +12,15 @@
   - `SecurityMonitoring.tsx`: 数据资产防护大屏
   - `AssetMonitoring.tsx`: 资产监测大屏
   - `InterfaceMonitoring.tsx`: 接口监控大屏
+  - `PasswordRules.tsx`: 密码安全规则管理
+  - `PasswordRuleDemo.tsx`: 密码规则组件演示
 - `/data`: 数据层
   - 各类模拟数据和数据处理逻辑
-- `App.tsx`: 应用主组件，包含路由和资源管理大屏
+- `/utils`: 工具函数
+  - `iconMapping.ts`: 图标资源映射工具
+- `/assets`: 静态资源
+  - `/icons`: 图标资源
+- `App.tsx`: 应用主组件，包含路由和导航
 - `index.tsx`: 应用入口
 - `index.css`: 全局样式
 
@@ -50,12 +56,14 @@
 
 ## 大屏页面说明
 
-项目共有4个大屏页面：
+项目共有6个页面：
 
-1. **资源管理大屏**: 位于`App.tsx`，显示平台资源管理情况
+1. **平台概览(ResourceMonitoring)**: 显示平台资源管理概况和各类指标
 2. **防护检测大屏(InterfaceMonitoring)**: 监控接口和服务安全情况
 3. **资产监测大屏(AssetMonitoring)**: 监控资产和业务应用情况
 4. **数据资产防护大屏(SecurityMonitoring)**: 监控数据资产安全防护情况
+5. **密码安全规则管理(PasswordRules)**: 管理密码安全策略和规则
+6. **密码规则组件演示(PasswordRuleDemo)**: 展示密码规则卡片组件的使用
 
 ## 开发流程
 
@@ -68,4 +76,6 @@
 
 ## 更新记录
 
-- 2023-11-01: 初始版本 
+- 2023-11-01: 初始版本
+- 2023-12-15: 添加密码规则管理模块，包括密码规则页面、专用卡片组件和演示页面
+- 2023-12-18: 全面优化UI布局，使界面更加紧凑；添加全局内容溢出处理；优化导航栏样式；启用真实图片图标代替SVG图标 
