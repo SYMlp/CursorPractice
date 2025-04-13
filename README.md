@@ -5,6 +5,7 @@
 ## 项目结构
 
 - `security-dashboard/` - 基于React的安全大屏项目，用于数据可视化展示
+- `insurance-retention-predictor/` - 保险续保预测项目，基于Python和机器学习算法
 - `projects-docs/` - 项目目标与收获记录
 - `.cursor/` - Cursor配置和模板，用于规范开发流程
 
@@ -18,6 +19,18 @@
 - **功能**: 资源管理概览、安全资源类型分布、安全规则跟踪、接口管理指标
 - [查看项目详情](./security-dashboard/README.md)
 - [查看项目目标与收获](./projects-docs/security-dashboard.md)
+
+### 保险续保预测项目 (insurance-retention-predictor)
+
+基于Python和机器学习算法开发的保险客户续保预测系统，通过分析客户特征识别潜在流失风险客户。
+
+- **技术栈**: Python、Pandas、Scikit-learn、Matplotlib、Seaborn
+- **功能**: 数据预处理、特征工程、逻辑回归模型、决策树模型、模型评估与解释
+- **核心模型**: 
+  - 逻辑回归模型 (准确率91%)
+  - 决策树模型 (高可解释性)
+- [查看项目详情](./insurance-retention-predictor/README.md)
+- [查看决策树模型分析](./决策树结果分析.md)
 
 ## 文档规范
 
@@ -48,7 +61,8 @@
 
 ## 更新记录
 
-- 2023-11-10: 项目初始化
-- 2023-11-12: 添加安全大屏项目
+- 2024-06-10: 添加保险续保预测项目和决策树分析报告
+- 2023-11-20: 添加Cursor规则配置和文档模板
 - 2023-11-15: 实现四个主要大屏页面
-- 2023-11-20: 添加Cursor规则配置和文档模板 
+- 2023-11-12: 添加安全大屏项目
+- 2023-11-10: 项目初始化 
