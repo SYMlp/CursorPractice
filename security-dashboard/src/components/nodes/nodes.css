@@ -1,0 +1,80 @@
+.node {
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 10px;
+  width: 180px;
+  background-color: white;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.node-content {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.node-header {
+  font-weight: bold;
+  padding: 4px 8px;
+  border-radius: 4px;
+  text-align: center;
+  margin-bottom: 8px;
+}
+
+.node-label {
+  font-size: 14px;
+  font-weight: 500;
+  margin-bottom: 5px;
+}
+
+.risk-score, .risk-level {
+  font-size: 12px;
+  color: #666;
+}
+
+/* 节点类型样式 */
+.node-header.resource {
+  background-color: #e3f2fd;
+  color: #0d47a1;
+}
+
+.node-header.service {
+  background-color: #e8f5e9;
+  color: #1b5e20;
+}
+
+.node-header.application {
+  background-color: #f3e5f5;
+  color: #4a148c;
+}
+
+.node-header.task {
+  background-color: #fff3e0;
+  color: #e65100;
+}
+
+.node-header.person {
+  background-color: #e8eaf6;
+  color: #1a237e;
+}
+
+/* 节点类型特定样式 */
+.resource-node {
+  border-color: #90caf9;
+}
+
+.service-node {
+  border-color: #a5d6a7;
+}
+
+.application-node {
+  border-color: #ce93d8;
+}
+
+.task-node {
+  border-color: #ffcc80;
+}
+
+.person-node {
+  border-color: #9fa8da;
+} 
