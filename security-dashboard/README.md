@@ -91,6 +91,23 @@ npm install
 
 ### 运行应用
 
+#### 方法一：使用启动脚本（推荐）
+
+项目提供了多种环境下的启动脚本，位于 `scripts` 目录：
+
+- **Windows环境**：双击运行 `scripts/start-app.bat`
+- **Linux/MacOS环境**：在终端中运行 `./scripts/start-app.sh`
+- **Python环境(跨平台)**：运行 `python scripts/start-app.py`
+
+所有脚本会自动：
+- 检查并切换到正确的目录
+- 安装依赖（如果需要）
+- 启动应用程序
+
+更多详细说明请查看 [scripts/README.md](./scripts/README.md)
+
+#### 方法二：使用命令行
+
 启动开发服务器:
 ```
 npm start
