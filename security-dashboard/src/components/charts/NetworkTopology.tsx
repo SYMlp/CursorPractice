@@ -1,138 +1,300 @@
-import React from 'react';
+import React, { useState } from 'react';
 import ReactECharts from 'echarts-for-react';
 import * as echarts from 'echarts';
 
-interface NetworkTopologyProps {
-  className?: string;
+interface NodeDetails {
+  name: string;
+  type: string;
+  ports: string[];
+  interfaces: string[];
 }
 
-const NetworkTopology: React.FC<NetworkTopologyProps> = ({ className }) => {
-  // 拓扑图的节点和连线数据
+const NetworkTopology: React.FC = () => {
+  const [selectedNode, setSelectedNode] = useState<NodeDetails | null>(null);
+
+  // 节点数据
   const nodes = [
+    // 根节点
     {
-      name: '安全访问',
-      x: 300,
-      y: 200,
-      itemStyle: {
-        color: '#67C23A'
-      },
+      name: '安全防护',
+      value: 60,
+      category: 0,
+      symbol: 'circle',
       symbolSize: 70,
-      category: 0
-    },
-    {
-      name: '接口访问',
-      x: 200,
-      y: 300,
       itemStyle: {
-        color: '#F56C6C'
+        color: '#3B82F6'
       },
-      symbolSize: 50,
-      category: 1
+      details: {
+        name: '安全防护',
+        type: '系统',
+        ports: ['45533'],
+        interfaces: ['安全管理接口', '策略配置接口']
+      }
     },
+    // 一级节点 - 四大服务
     {
-      name: '安全存储器',
-      x: 400,
-      y: 300,
-      itemStyle: {
-        color: '#409EFF'
-      },
-      symbolSize: 50,
-      category: 1
-    },
-    {
-      name: '安全算法库',
-      x: 200,
-      y: 400,
-      itemStyle: {
-        color: '#E6A23C'
-      },
-      symbolSize: 50,
-      category: 2
-    },
-    {
-      name: '安全配置',
-      x: 400,
-      y: 400,
-      itemStyle: {
-        color: '#FFCC66'
-      },
-      symbolSize: 50,
-      category: 2
-    },
-    {
-      name: '加密数据',
-      x: 300,
-      y: 500,
-      itemStyle: {
-        color: '#9B59B6'
-      },
+      name: '识别服务',
+      value: 50,
+      category: 1,
+      symbol: 'circle',
       symbolSize: 60,
-      category: 3
+      itemStyle: {
+        color: '#F97316'
+      },
+      details: {
+        name: '识别服务',
+        type: '服务',
+        ports: ['8080'],
+        interfaces: ['资产识别接口', '服务管理接口']
+      }
+    },
+    {
+      name: '防护服务',
+      value: 50,
+      category: 1,
+      symbol: 'circle',
+      symbolSize: 60,
+      itemStyle: {
+        color: '#F97316'
+      },
+      details: {
+        name: '防护服务',
+        type: '服务',
+        ports: ['8081'],
+        interfaces: ['防护策略接口', '规则配置接口']
+      }
+    },
+    {
+      name: '检测服务',
+      value: 50,
+      category: 1,
+      symbol: 'circle',
+      symbolSize: 60,
+      itemStyle: {
+        color: '#F97316'
+      },
+      details: {
+        name: '检测服务',
+        type: '服务',
+        ports: ['8082'],
+        interfaces: ['威胁检测接口', '告警管理接口']
+      }
+    },
+    {
+      name: '响应服务',
+      value: 50,
+      category: 1,
+      symbol: 'circle',
+      symbolSize: 60,
+      itemStyle: {
+        color: '#F97316'
+      },
+      details: {
+        name: '响应服务',
+        type: '服务',
+        ports: ['8083'],
+        interfaces: ['事件响应接口', '处置管理接口']
+      }
+    },
+    // 一级节点 - 四大类
+    {
+      name: '安全识别类',
+      value: 45,
+      category: 2,
+      symbol: 'circle',
+      symbolSize: 55,
+      itemStyle: {
+        color: '#8B5CF6'
+      },
+      details: {
+        name: '安全识别类',
+        type: '类别',
+        ports: ['9001'],
+        interfaces: ['识别能力接口']
+      }
+    },
+    {
+      name: '安全防护类',
+      value: 45,
+      category: 2,
+      symbol: 'circle',
+      symbolSize: 55,
+      itemStyle: {
+        color: '#8B5CF6'
+      },
+      details: {
+        name: '安全防护类',
+        type: '类别',
+        ports: ['9002'],
+        interfaces: ['防护能力接口']
+      }
+    },
+    {
+      name: '安全检测类',
+      value: 45,
+      category: 2,
+      symbol: 'circle',
+      symbolSize: 55,
+      itemStyle: {
+        color: '#8B5CF6'
+      },
+      details: {
+        name: '安全检测类',
+        type: '类别',
+        ports: ['9003'],
+        interfaces: ['检测能力接口']
+      }
+    },
+    {
+      name: '安全响应类',
+      value: 45,
+      category: 2,
+      symbol: 'circle',
+      symbolSize: 55,
+      itemStyle: {
+        color: '#8B5CF6'
+      },
+      details: {
+        name: '安全响应类',
+        type: '类别',
+        ports: ['9004'],
+        interfaces: ['响应能力接口']
+      }
+    },
+    // 二级节点
+    {
+      name: '主机资产发现',
+      value: 40,
+      category: 3,
+      symbol: 'circle',
+      symbolSize: 50,
+      itemStyle: {
+        color: '#10B981'
+      },
+      details: {
+        name: '主机资产发现',
+        type: '功能',
+        ports: ['7001'],
+        interfaces: ['资产发现接口', '资产管理接口']
+      }
+    },
+    {
+      name: '软件资产识别',
+      value: 40,
+      category: 3,
+      symbol: 'circle',
+      symbolSize: 50,
+      itemStyle: {
+        color: '#10B981'
+      },
+      details: {
+        name: '软件资产识别',
+        type: '功能',
+        ports: ['7002'],
+        interfaces: ['软件识别接口', '软件管理接口']
+      }
+    },
+    {
+      name: '网络攻击抑制',
+      value: 40,
+      category: 3,
+      symbol: 'circle',
+      symbolSize: 50,
+      itemStyle: {
+        color: '#10B981'
+      },
+      details: {
+        name: '网络攻击抑制',
+        type: '功能',
+        ports: ['7003'],
+        interfaces: ['攻击抑制接口', '策略配置接口']
+      }
     }
   ];
 
+  // 连线数据
   const links = [
+    // 根节点到一级节点
     {
-      source: '安全访问',
-      target: '接口访问',
-      lineStyle: {
-        color: '#FF9900',
-        width: 2
-      }
+      source: '安全防护',
+      target: '识别服务',
+      lineStyle: { color: '#94A3B8', width: 2 }
     },
     {
-      source: '安全访问',
-      target: '安全存储器',
-      lineStyle: {
-        color: '#FF9900',
-        width: 2
-      }
+      source: '安全防护',
+      target: '防护服务',
+      lineStyle: { color: '#94A3B8', width: 2 }
     },
     {
-      source: '接口访问',
-      target: '安全算法库',
-      lineStyle: {
-        color: '#87CEFA',
-        width: 2
-      }
+      source: '安全防护',
+      target: '检测服务',
+      lineStyle: { color: '#94A3B8', width: 2 }
     },
     {
-      source: '安全存储器',
-      target: '安全配置',
-      lineStyle: {
-        color: '#87CEFA',
-        width: 2
-      }
+      source: '安全防护',
+      target: '响应服务',
+      lineStyle: { color: '#94A3B8', width: 2 }
     },
     {
-      source: '安全算法库',
-      target: '加密数据',
-      lineStyle: {
-        color: '#2ECE89',
-        width: 2
-      }
+      source: '安全防护',
+      target: '安全识别类',
+      lineStyle: { color: '#94A3B8', width: 2 }
     },
     {
-      source: '安全配置',
-      target: '加密数据',
-      lineStyle: {
-        color: '#2ECE89',
-        width: 2
-      }
+      source: '安全防护',
+      target: '安全防护类',
+      lineStyle: { color: '#94A3B8', width: 2 }
+    },
+    {
+      source: '安全防护',
+      target: '安全检测类',
+      lineStyle: { color: '#94A3B8', width: 2 }
+    },
+    {
+      source: '安全防护',
+      target: '安全响应类',
+      lineStyle: { color: '#94A3B8', width: 2 }
+    },
+    // 识别服务到二级节点
+    {
+      source: '识别服务',
+      target: '主机资产发现',
+      lineStyle: { color: '#94A3B8', width: 2 }
+    },
+    {
+      source: '识别服务',
+      target: '软件资产识别',
+      lineStyle: { color: '#94A3B8', width: 2 }
+    },
+    // 响应服务到二级节点
+    {
+      source: '响应服务',
+      target: '网络攻击抑制',
+      lineStyle: { color: '#94A3B8', width: 2 }
     }
   ];
 
   const categories = [
     { name: '根节点' },
-    { name: '一级节点' },
-    { name: '二级节点' },
-    { name: '三级节点' }
+    { name: '服务节点' },
+    { name: '类别节点' },
+    { name: '功能节点' }
   ];
 
   const option = {
     tooltip: {
       trigger: 'item',
-      formatter: '{b}'
+      formatter: (params: any) => {
+        const { data } = params;
+        if (data.details) {
+          return `
+            <div class="font-medium">${data.details.name}</div>
+            <div class="text-xs mt-1">类型：${data.details.type}</div>
+            <div class="text-xs">端口：${data.details.ports.join(', ')}</div>
+          `;
+        }
+        return data.name;
+      }
     },
     legend: {
       data: categories.map(a => a.name),
@@ -149,62 +311,88 @@ const NetworkTopology: React.FC<NetworkTopologyProps> = ({ className }) => {
       {
         name: '网络拓扑',
         type: 'graph',
-        layout: 'none',
+        layout: 'force',
         data: nodes,
         links: links,
         categories: categories,
         roam: true,
-        focusNodeAdjacency: true,
+        draggable: true,
+        force: {
+          repulsion: 400,
+          edgeLength: 200
+        },
         label: {
           show: true,
-          position: 'inside',
+          position: 'bottom',
           formatter: '{b}',
           fontSize: 12,
-          fontStyle: '400',
-          color: '#fff'
+          color: '#666'
         },
         lineStyle: {
-          color: 'source',
-          curveness: 0.3
+          curveness: 0  // 设置为0表示直线
         },
         emphasis: {
+          focus: 'adjacency',
           lineStyle: {
-            width: 6
-          },
-          itemStyle: {
-            shadowBlur: 10,
-            shadowColor: 'rgba(0, 0, 0, 0.3)'
+            width: 4
           }
         }
       }
     ]
   };
 
-  // 额外信息区域数据
-  const infoData = {
-    安全防护通信协议: 'XXXXX',
-    接口总数量: 432516,
-    接口响应时间: '5s',
+  const onChartClick = (params: any) => {
+    if (params.data && params.data.details) {
+      setSelectedNode(params.data.details);
+    }
+  };
+
+  const onEvents = {
+    click: onChartClick
   };
 
   return (
-    <div className={`bg-white rounded-lg shadow p-4 ${className || ''}`}>
-      <h2 className="text-lg font-medium mb-4 text-gray-700">接口网络拓扑</h2>
-      <div className="relative">
-        <ReactECharts
-          option={option}
-          style={{ height: '400px', width: '100%' }}
-        />
-        <div className="absolute top-10 left-10 bg-white/80 p-3 rounded-lg border border-gray-200 shadow-sm">
-          <div className="text-sm font-semibold text-blue-600 mb-2">当前状态</div>
-          {Object.entries(infoData).map(([key, value]) => (
-            <div key={key} className="flex text-xs mb-1">
-              <span className="text-gray-600 mr-2">{key}:</span>
-              <span className="text-gray-900">{value}</span>
+    <div className="relative">
+      <ReactECharts
+        option={option}
+        style={{ height: '400px' }}
+        onEvents={onEvents}
+      />
+      
+      {selectedNode && (
+        <div className="absolute top-4 right-4 bg-white p-4 rounded-lg shadow-lg border border-gray-200 w-64">
+          <div className="flex justify-between items-center mb-3">
+            <button
+              className="text-gray-400 hover:text-gray-500"
+              onClick={() => setSelectedNode(null)}
+            >
+              ✕
+            </button>
+          </div>
+          <div className="space-y-3">
+            <div>
+              <div className="text-sm font-medium text-gray-500">名称</div>
+              <div className="text-sm">{selectedNode.name}</div>
             </div>
-          ))}
+            <div>
+              <div className="text-sm font-medium text-gray-500">类型</div>
+              <div className="text-sm">{selectedNode.type}</div>
+            </div>
+            <div>
+              <div className="text-sm font-medium text-gray-500">端口</div>
+              <div className="text-sm">{selectedNode.ports.join(', ')}</div>
+            </div>
+            <div>
+              <div className="text-sm font-medium text-gray-500">接口列表</div>
+              <ul className="list-disc list-inside text-sm">
+                {selectedNode.interfaces.map((intf, index) => (
+                  <li key={index}>{intf}</li>
+                ))}
+              </ul>
+            </div>
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 };

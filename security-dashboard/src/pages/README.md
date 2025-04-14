@@ -180,6 +180,7 @@ const [activePage, setActivePage] = useState<'resources' | 'monitoring' | 'asset
 
 ## 更新记录
 
+- 2024-05-01: 完成文件名和组件名的统一，将ResourceMonitoring.tsx重命名为PlatformOverview.tsx，增强页面交互功能
 - 2024-04-13: 优化平台概览页布局，使其更接近设计图，包括添加卡片边框、调整网格布局、优化环形进度图和折线图样式
 - 2023-12-18: 优化PlatformOverview页面布局，使其更加紧凑；修复内容溢出问题；启用真实图片图标替代SVG图标
 - 2023-12-15: 添加密码规则相关页面（PasswordRules和PasswordRuleDemo）

@@ -10,16 +10,22 @@ icons/
 │   ├── resource.png    # 资源总量图标
 │   ├── identity.png    # 身份标识图标
 │   └── standard.png    # 标准化属性图标
-├── rules/              # 安全规则相关图标
-│   ├── identify.png    # 安全识别规则图标
-│   ├── protection.png  # 安全防护规则图标
-│   ├── detect.png      # 安全检测规则图标
-│   ├── password.png    # 安全密码规则图标
-│   └── response.png    # 安全响应规则图标
 ├── interface/          # 接口相关图标
 │   ├── api.png         # 接口图标
 │   ├── south.png       # 南向接口图标
-│   └── north.png       # 北向接口图标
+│   ├── north.png       # 北向接口图标
+│   ├── register.png    # 接口注册总数图标
+│   ├── publish.png     # 接口发布数图标
+│   └── schedule.png    # 接口调度任务数图标
+├── task/              # 任务相关图标
+│   ├── control.png     # 任务执行控制图标
+│   └── monitor.png     # 任务执行监测异常图标
+├── security/          # 安全相关图标
+│   ├── cert-manage.png # 通讯证书管理图标
+│   ├── network-suppress.png # 网络攻击抑制图标
+│   ├── host-discover.png # 主机资产发现图标
+│   ├── software-identify.png # 软件资产识别图标
+│   └── security-identify.png # 安全识别类图标
 └── services/           # 服务相关图标
     ├── identify.png    # 识别服务图标
     ├── protection.png  # 防护服务图标
@@ -77,14 +83,16 @@ import { getIcon } from '../utils/iconMapping';
 | platform | resource.png | 资源卡片主图标 | 64x64px |
 | platform | identity.png | 身份标识指标 | 24x24px |
 | platform | standard.png | 标准化属性指标 | 24x24px |
-| rules | identify.png | 安全识别规则卡片 | 32x32px |
-| rules | protection.png | 安全防护规则卡片 | 32x32px |
-| rules | detect.png | 安全检测规则卡片 | 32x32px |
-| rules | password.png | 安全密码规则卡片 | 32x32px |
-| rules | response.png | 安全响应规则卡片 | 32x32px |
-| interface | api.png | 接口总数图标 | 32x32px |
-| interface | south.png | 南向接口图标 | 24x24px |
-| interface | north.png | 北向接口图标 | 24x24px |
+| interface | register.png | 接口注册总数 | 32x32px |
+| interface | publish.png | 接口发布数 | 32x32px |
+| interface | schedule.png | 接口调度任务数 | 32x32px |
+| task | control.png | 任务执行控制 | 32x32px |
+| task | monitor.png | 任务执行监测异常 | 32x32px |
+| security | cert-manage.png | 通讯证书管理 | 32x32px |
+| security | network-suppress.png | 网络攻击抑制 | 32x32px |
+| security | host-discover.png | 主机资产发现 | 32x32px |
+| security | software-identify.png | 软件资产识别 | 32x32px |
+| security | security-identify.png | 安全识别类 | 32x32px |
 | services | identify.png | 识别服务图表标题 | 24x24px |
 | services | protection.png | 防护服务图表标题 | 24x24px |
 | services | detection.png | 检测服务图表标题 | 24x24px |
@@ -196,4 +204,6 @@ const iconSrc = getIcon('passwordRule') || passwordRuleIcon;
 
 - 2023-11-01: 初始版本，添加基础图标说明
 - 2023-12-15: 添加password.png图标及使用示例
-- 2023-12-18: 全面实施图标系统改进，从SVG转向真实图片，优化图标尺寸和显示效果 
+- 2023-12-18: 全面实施图标系统改进，从SVG转向真实图片，优化图标尺寸和显示效果
+- 2024-04-14: 添加services目录及相关服务图标
+- 2024-04-14: 添加interface、task和security目录及相关图标 

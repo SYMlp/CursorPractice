@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import ReactECharts from 'echarts-for-react';
 
 interface LineData {
@@ -8,23 +8,31 @@ interface LineData {
   areaStyle?: boolean;
 }
 
+type TimeRange = 'day' | 'week';
+
 interface MultiLineChartProps {
   title: string;
-  xAxisData: string[];
-  series: LineData[];
+  timeData: {
+    day: { xAxis: string[] };
+    week: { xAxis: string[] };
+  };
+  series: {
+    day: { series: LineData[] };
+    week: { series: LineData[] };
+  };
   showLegend?: boolean;
-  showTimeSwitch?: boolean;
   className?: string;
 }
 
 const MultiLineChart: React.FC<MultiLineChartProps> = ({
   title,
-  xAxisData,
+  timeData,
   series,
   showLegend = true,
-  showTimeSwitch = true,
   className = '',
 }) => {
+  const [timeRange, setTimeRange] = useState<TimeRange>('day');
+
   const option = {
     tooltip: {
       trigger: 'axis',
@@ -51,7 +59,7 @@ const MultiLineChart: React.FC<MultiLineChartProps> = ({
     xAxis: {
       type: 'category',
       boundaryGap: false,
-      data: xAxisData,
+      data: timeData[timeRange].xAxis,
       axisLine: {
         lineStyle: {
           color: '#e5e7eb'
@@ -75,7 +83,7 @@ const MultiLineChart: React.FC<MultiLineChartProps> = ({
         }
       }
     },
-    series: series.map(s => ({
+    series: series[timeRange].series.map(s => ({
       name: s.name,
       type: 'line',
       data: s.data,
@@ -112,12 +120,28 @@ const MultiLineChart: React.FC<MultiLineChartProps> = ({
       <div className="p-4">
         <div className="flex justify-between items-center">
           <h3 className="text-lg font-medium text-gray-700">{title}</h3>
-          {showTimeSwitch && (
-            <div className="flex space-x-3 text-xs">
-              <button className="px-2 py-1 rounded text-gray-500 hover:text-blue-500">一天</button>
-              <button className="px-2 py-1 rounded bg-blue-50 text-blue-500">一周</button>
-            </div>
-          )}
+          <div className="flex space-x-2">
+            <button
+              onClick={() => setTimeRange('day')}
+              className={`px-3 py-1 text-sm rounded transition-colors ${
+                timeRange === 'day'
+                  ? 'bg-blue-500 text-white'
+                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+              }`}
+            >
+              一天
+            </button>
+            <button
+              onClick={() => setTimeRange('week')}
+              className={`px-3 py-1 text-sm rounded transition-colors ${
+                timeRange === 'week'
+                  ? 'bg-blue-500 text-white'
+                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+              }`}
+            >
+              一周
+            </button>
+          </div>
         </div>
       </div>
       <ReactECharts 

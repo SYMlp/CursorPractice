@@ -7,7 +7,8 @@ import {
   LayersIcon, 
   InterfaceIcon,
   IdentityIcon,
-  StandardIcon
+  StandardIcon,
+  LoadingIcon
 } from './Icons';
 import ImageIcon from './ImageIcon';
 
@@ -21,5 +22,6 @@ export {
   InterfaceIcon,
   IdentityIcon,
   StandardIcon,
+  LoadingIcon,
   ImageIcon
 }; 

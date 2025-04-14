@@ -30,12 +30,12 @@ const RuleCard: React.FC<RuleCardProps> = ({
           
           <div className="flex justify-between mt-2 text-sm">
             <div>
-              <div className="text-green-500">已下发</div>
-              <div>{baseCount}</div>
+              <div >已下发</div>
+              <div className="text-green-500">{baseCount}</div>
             </div>
             <div>
-              <div className="text-red-500">已撤销</div>
-              <div>{todayCount}</div>
+              <div>已撤销</div>
+              <div className="text-red-500">{todayCount}</div>
             </div>
           </div>
         </div>

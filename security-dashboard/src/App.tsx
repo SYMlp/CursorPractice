@@ -27,7 +27,7 @@ import {
 import InterfaceMonitoring from './pages/InterfaceMonitoring';
 import AssetMonitoring from './pages/AssetMonitoring';
 import SecurityMonitoring from './pages/SecurityMonitoring';
-import PlatformOverview from './pages/ResourceMonitoring';
+import PlatformOverview from './pages/PlatformOverview';
 import PasswordRules from './pages/PasswordRules';
 import PasswordRuleDemo from './pages/PasswordRuleDemo';
 
@@ -35,7 +35,7 @@ import PasswordRuleDemo from './pages/PasswordRuleDemo';
 import securityLogo from './assets/icons/security-logo.png';
 
 function App() {
-  const [activePage, setActivePage] = useState<'resources' | 'monitoring' | 'asset' | 'security' | 'password' | 'passwordDemo'>('resources');
+  const [activePage, setActivePage] = useState<'resources' | 'monitoring' | 'asset' | 'security' | 'password' | 'passwordDemo' | 'blank'>('resources');
 
   return (
     <div className="bg-gray-100 min-h-screen">
@@ -133,6 +133,16 @@ function App() {
               }`}
             >
               组件演示
+            </button>
+            <button
+              onClick={() => setActivePage('blank')}
+              className={`py-2 px-3 ${
+                activePage === 'blank'
+                  ? 'text-blue-700 font-medium border-b-2 border-blue-500'
+                  : 'text-gray-600 hover:text-gray-900'
+              }`}
+            >
+              空白页面
             </button>
           </div>
         </div>
