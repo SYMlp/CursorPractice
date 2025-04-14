@@ -24,6 +24,7 @@ interface BarChartProps {
   className?: string;
   horizontal?: boolean;
   showLegend?: boolean;
+  showLabel?: boolean;
 }
 
 const isBarItemArray = (data: BarItem[] | CategoryBarChartData): data is BarItem[] => {
@@ -35,7 +36,8 @@ const BarChart: React.FC<BarChartProps> = ({
   data,
   className = '',
   horizontal = false,
-  showLegend = false
+  showLegend = false,
+  showLabel = false
 }) => {
   let chartOption;
 
@@ -107,7 +109,7 @@ const BarChart: React.FC<BarChartProps> = ({
           })),
           barWidth: horizontal ? 15 : 30,
           label: {
-            show: true,
+            show: showLabel,
             position: horizontal ? 'right' : 'top',
             fontSize: 12,
             color: '#666'
@@ -182,7 +184,7 @@ const BarChart: React.FC<BarChartProps> = ({
         })),
         barWidth: horizontal ? 15 : 30,
         label: {
-          show: true,
+          show: showLabel,
           position: horizontal ? 'right' : 'top',
           fontSize: 12,
           color: '#666'

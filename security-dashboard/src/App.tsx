@@ -1,41 +1,16 @@
 import React, { useState } from 'react';
 import './App.css';
-import CircularProgress from './components/charts/CircularProgress';
-import LineChart from './components/charts/LineChart';
-import PieChart from './components/charts/PieChart';
-import ResourceCard from './components/cards/ResourceCard';
-import RuleCard from './components/cards/RuleCard';
-import InterfaceCard from './components/cards/InterfaceCard';
-import { 
-  DatabaseIcon, 
-  ShieldIcon, 
-  AlertIcon, 
-  DocumentIcon, 
-  CheckListIcon, 
-  LayersIcon, 
-  InterfaceIcon,
-  KeyIcon
-} from './components/icons/Icons';
-import { 
-  resourceManagementData, 
-  resourceTypesData, 
-  securityRulesData, 
-  interfaceManagementData,
-  timeSeriesData,
-  interfaceSecurityDistribution
-} from './data/mockData';
+
 import InterfaceMonitoring from './pages/InterfaceMonitoring';
 import AssetMonitoring from './pages/AssetMonitoring';
-import SecurityMonitoring from './pages/SecurityMonitoring';
-import PlatformOverview from './pages/ResourceMonitoring';
-import PasswordRules from './pages/PasswordRules';
-import PasswordRuleDemo from './pages/PasswordRuleDemo';
+import DataAssetMonitoring from './pages/DataAssetMonitoring';
+import PlatformOverview from './pages/PlatformOverview';
 
 // 导入安全图标
 import securityLogo from './assets/icons/security-logo.png';
 
 function App() {
-  const [activePage, setActivePage] = useState<'resources' | 'monitoring' | 'asset' | 'security' | 'password' | 'passwordDemo'>('resources');
+  const [activePage, setActivePage] = useState<'resources' | 'monitoring' | 'asset' | 'security'>('resources');
 
   return (
     <div className="bg-gray-100 min-h-screen">
@@ -92,7 +67,7 @@ function App() {
                   : 'text-gray-600 hover:text-gray-900'
               }`}
             >
-              防护检测
+              接口监测
             </button>
             <button
               onClick={() => setActivePage('asset')}
@@ -102,7 +77,7 @@ function App() {
                   : 'text-gray-600 hover:text-gray-900'
               }`}
             >
-              资产监测
+              应用资产监测
             </button>
             <button
               onClick={() => setActivePage('security')}
@@ -112,27 +87,7 @@ function App() {
                   : 'text-gray-600 hover:text-gray-900'
               }`}
             >
-              数据资产防护
-            </button>
-            <button
-              onClick={() => setActivePage('password')}
-              className={`py-2 px-3 flex items-center ${
-                activePage === 'password'
-                  ? 'text-blue-700 font-medium border-b-2 border-blue-500'
-                  : 'text-gray-600 hover:text-gray-900'
-              }`}
-            >
-              <KeyIcon size={14} className="mr-1" /> 密码规则
-            </button>
-            <button
-              onClick={() => setActivePage('passwordDemo')}
-              className={`py-2 px-3 ${
-                activePage === 'passwordDemo'
-                  ? 'text-blue-700 font-medium border-b-2 border-blue-500'
-                  : 'text-gray-600 hover:text-gray-900'
-              }`}
-            >
-              组件演示
+              数据资产监测
             </button>
           </div>
         </div>
@@ -142,9 +97,8 @@ function App() {
       {activePage === 'resources' && <PlatformOverview />}
       {activePage === 'monitoring' && <InterfaceMonitoring />}
       {activePage === 'asset' && <AssetMonitoring />}
-      {activePage === 'security' && <SecurityMonitoring />}
-      {activePage === 'password' && <PasswordRules />}
-      {activePage === 'passwordDemo' && <PasswordRuleDemo />}
+      {activePage === 'security' && <DataAssetMonitoring />}
+
     </div>
   );
 }

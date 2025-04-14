@@ -1,6 +1,168 @@
-# 安全大屏项目
+# 安全仪表盘（Security Dashboard）
 
-基于React的安全防护仪表盘，展示安全资源、规则和接口相关的各种指标和图表。
+基于 React 和 TypeScript 开发的安全仪表盘应用，提供平台概览、资产监控、接口监控和安全监控等功能。
+
+## 项目结构
+
+```
+security-dashboard/
+├── public/                    # 静态文件
+│   ├── index.html             # 主HTML文件
+│   └── assets/                # 静态资源
+├── src/                       # 源代码
+│   ├── components/            # 通用组件
+│   │   ├── charts/            # 图表组件
+│   │   ├── icons/             # 图标组件
+│   │   ├── nodes/             # 节点组件
+│   │   └── layout/            # 布局组件
+│   ├── pages/                 # 页面组件
+│   │   ├── PlatformOverview.tsx  # 平台概览
+│   │   ├── AssetMonitoring.tsx   # 资产监控
+│   │   ├── InterfaceMonitoring.tsx # 接口监控
+│   │   └── SecurityMonitoring.tsx  # 安全监控
+│   ├── data/                  # 数据层
+│   │   ├── api/               # API接口层
+│   │   ├── mock/              # 模拟数据层
+│   │   ├── services/          # 服务层
+│   │   └── utils/             # 数据工具
+│   ├── styles/                # 样式文件
+│   ├── utils/                 # 通用工具
+│   ├── hooks/                 # 自定义钩子
+│   ├── types/                 # 全局类型定义
+│   ├── App.tsx                # 应用入口
+│   └── index.tsx              # 渲染入口
+├── .env                       # 开发环境变量
+├── .env.production            # 生产环境变量
+└── package.json               # 依赖管理
+```
+
+## 数据架构设计
+
+安全仪表盘应用采用分层架构设计，数据流清晰，便于后期从模拟数据切换到真实 API。
+
+### 数据层结构
+
+```
+data/
+├── api/                # API接口层 - 处理与服务器的通信
+│   ├── asset.ts        # 资产相关API
+│   ├── platform.ts     # 平台概览相关API
+│   ├── interface.ts    # 接口监控相关API
+│   ├── security.ts     # 安全监控相关API
+│   ├── types.ts        # API通用类型定义
+│   └── index.ts        # 统一导出
+├── mock/               # 模拟数据层 - 提供开发和测试用的模拟数据
+│   ├── asset/          # 资产监控模拟数据
+│   ├── platform/       # 平台概览模拟数据
+│   ├── interface/      # 接口监控模拟数据
+│   ├── security/       # 安全监控模拟数据
+│   └── common/         # 公共模拟数据
+├── services/           # 服务层 - 组合API调用，提供业务逻辑
+│   ├── assetService.ts
+│   ├── platformService.ts
+│   ├── interfaceService.ts
+│   └── securityService.ts
+└── utils/              # 数据工具 - 提供数据处理工具函数
+    ├── formatters.ts   # 数据格式化工具
+    └── transformers.ts # 数据转换工具
+```
+
+### 分层职责
+
+1. **API层**
+   - 负责与后端API通信，处理请求和响应
+   - 封装fetch/axios等HTTP请求
+   - 根据环境变量决定是否使用模拟数据
+   - 实现API调用失败时的降级策略
+
+2. **模拟数据层**
+   - 提供开发和测试阶段的数据支持
+   - 按功能模块组织，结构清晰
+   - 所有数据均有TypeScript类型定义
+   - 提供静态数据和动态生成函数
+
+3. **服务层**
+   - 封装业务逻辑，组合API调用
+   - 提供统一的数据访问接口
+   - 处理错误和异常情况
+   - 对UI组件屏蔽数据获取的复杂性
+
+4. **工具层**
+   - 提供通用的数据处理函数
+   - 包括格式化、转换等功能
+   - 避免代码重复，提高开发效率
+
+### 数据流
+
+1. **数据获取流程**
+   ```
+   UI组件 → 服务层 → API层 → (模拟数据/真实API) → API层 → 服务层 → UI组件
+   ```
+
+2. **错误处理流程**
+   ```
+   API层(出错) → 使用模拟数据降级 → 返回数据给服务层 → 服务层处理异常 → UI组件显示错误信息
+   ```
+
+## 环境变量配置
+
+项目使用环境变量控制是否使用模拟数据：
+
+1. `.env` - 开发环境配置
+   ```
+   REACT_APP_USE_MOCK=true
+   REACT_APP_API_BASE_URL=http://localhost:3000/api
+   ```
+
+2. `.env.production` - 生产环境配置
+   ```
+   REACT_APP_USE_MOCK=false
+   REACT_APP_API_BASE_URL=https://api.example.com
+   ```
+
+## 如何使用
+
+### 安装依赖
+
+```bash
+npm install
+```
+
+### 启动开发服务器
+
+```bash
+npm start
+```
+
+### 构建生产版本
+
+```bash
+npm run build
+```
+
+## 模拟数据与真实API切换
+
+1. 开发阶段：默认使用模拟数据（REACT_APP_USE_MOCK=true）
+2. 生产阶段：使用真实API（REACT_APP_USE_MOCK=false）
+3. 测试阶段：可通过修改环境变量灵活切换
+
+## 添加新功能流程
+
+1. 在模拟数据层添加相应的模拟数据
+2. 在API层添加相应的API接口
+3. 在服务层添加业务逻辑处理
+4. 在页面组件中通过服务层获取数据
+
+## 更新记录
+
+- 2024-07-13: 完成数据层架构设计，实现资产监控模块
+- 2024-07-12: 完成资产监控模块的模拟数据迁移
+- 2024-07-10: 应用资产监控页面优化，统一组件导入
+- 2024-07-01: 优化页面布局和交互体验
+- 2024-06-30: 统一页面风格
+- 2024-06-26: 文件一致性调整
+- 2024-06-25: 项目结构清理
+- 2024-04-15: 文件结构优化
 
 ## 功能特点
 

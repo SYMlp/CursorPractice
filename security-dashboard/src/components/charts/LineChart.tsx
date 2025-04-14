@@ -13,7 +13,7 @@ interface LineChartProps {
   xAxisData: string[];
   series: DataSeries[];
   showLegend?: boolean;
-  height?: number;
+  height?: number | string;
 }
 
 const LineChart: React.FC<LineChartProps> = ({ 
@@ -38,10 +38,18 @@ const LineChart: React.FC<LineChartProps> = ({
     },
     tooltip: {
       trigger: 'axis',
-      backgroundColor: 'rgba(255, 255, 255, 0.9)',
+      backgroundColor: 'rgba(255, 255, 255, 0.95)',
       borderColor: '#e5e7eb',
       textStyle: {
         color: '#334155'
+      },
+      axisPointer: {
+        type: 'line',
+        lineStyle: {
+          color: 'rgba(0, 0, 0, 0.2)',
+          width: 1,
+          type: 'dashed'
+        }
       }
     },
     legend: {
@@ -54,13 +62,13 @@ const LineChart: React.FC<LineChartProps> = ({
       icon: 'circle',
       itemWidth: 8,
       itemHeight: 8,
-      padding: [2, 5]
+      padding: [0, 5]
     },
     grid: {
       left: '3%',
       right: '4%',
-      bottom: showLegend ? '8%' : '3%',
-      top: title ? '12%' : '3%',
+      bottom: showLegend ? '12%' : '8%',
+      top: title ? '12%' : '8%',
       containLabel: true
     },
     xAxis: {
@@ -74,9 +82,12 @@ const LineChart: React.FC<LineChartProps> = ({
       },
       axisLabel: {
         color: '#6b7280',
-        fontSize: 10,
-        margin: 6,
-        align: 'center'
+        fontSize: 9,
+        margin: 10,
+        align: 'center',
+        rotate: 0,
+        hideOverlap: false,
+        interval: 0,
       }
     },
     yAxis: {
@@ -86,8 +97,14 @@ const LineChart: React.FC<LineChartProps> = ({
       },
       axisLabel: {
         color: '#6b7280',
-        fontSize: 10,
-        margin: 6
+        fontSize: 9,
+        margin: 6,
+        formatter: (value: number) => {
+          if (value >= 1000) {
+            return (value / 1000) + 'k';
+          }
+          return value;
+        }
       },
       splitLine: {
         lineStyle: {
@@ -101,13 +118,13 @@ const LineChart: React.FC<LineChartProps> = ({
       type: 'line',
       data: s.data,
       symbol: 'circle',
-      symbolSize: 6,
+      symbolSize: 5,
       smooth: true,
       showSymbol: false,
       emphasis: {
-        scale: 1.5,
+        scale: 1.2,
         itemStyle: {
-          shadowBlur: 5,
+          shadowBlur: 3,
           shadowColor: 'rgba(0, 0, 0, 0.2)'
         }
       },
@@ -137,10 +154,23 @@ const LineChart: React.FC<LineChartProps> = ({
     }))
   };
 
+  // 处理高度样式，支持数字或百分比字符串
+  const getHeightStyle = () => {
+    if (typeof height === 'number') {
+      return { height: `${height}px`, width: '100%' };
+    }
+    return { height: height, width: '100%' };
+  };
+
   return (
     <ReactECharts 
       option={option} 
-      style={{ height: `${height}px`, width: '100%' }} 
+      style={getHeightStyle()} 
+      opts={{ 
+        renderer: 'canvas',
+        devicePixelRatio: 2
+      }}
+      notMerge={true}
     />
   );
 };
