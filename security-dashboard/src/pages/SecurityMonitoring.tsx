@@ -65,97 +65,62 @@ const SecurityMonitoring: React.FC = () => {
       <div className="max-w-7xl mx-auto">
         <h1 className="text-2xl font-bold text-gray-800 mb-6">数据资产防护监测</h1>
         
-        {/* 统计数据卡片 */}
-        <div className="mb-6 grid grid-cols-3 gap-4">
-          <div className="bg-indigo-500 rounded-lg shadow p-4">
-            <div className="flex items-center">
-              <div className="mr-4">
-                <svg className="w-8 h-8 text-white" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M4 7a2 2 0 012-2h12a2 2 0 012 2v10a2 2 0 01-2 2H6a2 2 0 01-2-2V7z" stroke="currentColor" strokeWidth="2"/>
-                  <path d="M8 12h8m-8 3h4" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-                </svg>
-              </div>
-              <div>
-                <div className="text-2xl font-bold text-white">2,4324</div>
-                <div className="text-sm text-white/80">数据总量</div>
-              </div>
-            </div>
-          </div>
-          <div className="bg-purple-500 rounded-lg shadow p-4">
-            <div className="flex items-center">
-              <div className="mr-4">
-                <svg className="w-8 h-8 text-white" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M4 4h16a2 2 0 012 2v12a2 2 0 01-2 2H4a2 2 0 01-2-2V6a2 2 0 012-2z" stroke="currentColor" strokeWidth="2"/>
-                  <path d="M8 8h8M8 12h8M8 16h4" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-                </svg>
-              </div>
-              <div>
-                <div className="text-2xl font-bold text-white">322</div>
-                <div className="text-sm text-white/80">数据分类数</div>
-              </div>
-            </div>
-          </div>
-          <div className="bg-fuchsia-500 rounded-lg shadow p-4">
-            <div className="flex items-center">
-              <div className="mr-4">
-                <svg className="w-8 h-8 text-white" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2" stroke="currentColor" strokeWidth="2"/>
-                  <path d="M12 3v6m0 0l-2-2m2 2l2-2" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-                </svg>
-              </div>
-              <div>
-                <div className="text-2xl font-bold text-white">8</div>
-                <div className="text-sm text-white/80">数据分级数</div>
-              </div>
-            </div>
-          </div>
-        </div>
-
         {/* 顶部区域 - 分为左右两部分 */}
         <div className="grid grid-cols-12 gap-4 mb-6">
           {/* 左上: 数据资产数，数据分类数，数据分级数 */}
           <div className="col-span-8">
             <div className="grid grid-cols-3 gap-4 mb-4">
-              <div className="bg-white rounded-lg p-4 shadow-sm">
+              <div className="bg-emerald-500 rounded-lg p-4 shadow-sm">
                 <div className="flex items-center justify-between">
-                  <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
-                    <DataIcon className="w-6 h-6 text-blue-500" />
+                  <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center">
+                    <svg className="w-6 h-6 text-white" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M4 7a2 2 0 012-2h12a2 2 0 012 2v10a2 2 0 01-2 2H6a2 2 0 01-2-2V7z" stroke="currentColor" strokeWidth="2"/>
+                      <path d="M8 12h8m-8 3h4" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+                    </svg>
                   </div>
                   <div className="text-right">
-                    <p className="text-sm text-gray-500">数据总量</p>
-                    <p className="text-2xl font-bold text-gray-800">1,234,567</p>
+                    <p className="text-sm text-white/80">数据总量</p>
+                    <p className="text-2xl font-bold text-white">2,4324</p>
                   </div>
                 </div>
             </div>
-              <div className="bg-white rounded-lg p-4 shadow-sm">
+              <div className="bg-blue-500 rounded-lg p-4 shadow-sm">
                 <div className="flex items-center justify-between">
-                  <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
-                    <DataIcon className="w-6 h-6 text-green-500" />
+                  <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center">
+                    <svg className="w-6 h-6 text-white" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M4 4h16a2 2 0 012 2v12a2 2 0 01-2 2H4a2 2 0 01-2-2V6a2 2 0 012-2z" stroke="currentColor" strokeWidth="2"/>
+                      <path d="M8 8h8M8 12h8M8 16h4" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+                    </svg>
         </div>
                   <div className="text-right">
-                    <p className="text-sm text-gray-500">数据分类数</p>
-                    <p className="text-2xl font-bold text-gray-800">12</p>
+                    <p className="text-sm text-white/80">数据分类数</p>
+                    <p className="text-2xl font-bold text-white">322</p>
         </div>
                 </div>
               </div>
-              <div className="bg-white rounded-lg p-4 shadow-sm">
+              <div className="bg-blue-500 rounded-lg p-4 shadow-sm">
                 <div className="flex items-center justify-between">
-                  <div className="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center">
-                    <DataIcon className="w-6 h-6 text-purple-500" />
+                  <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center">
+                    <svg className="w-6 h-6 text-white" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2" stroke="currentColor" strokeWidth="2"/>
+                      <path d="M12 3v6m0 0l-2-2m2 2l2-2" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+                    </svg>
                         </div>
                   <div className="text-right">
-                    <p className="text-sm text-gray-500">数据分级数</p>
-                    <p className="text-2xl font-bold text-gray-800">4</p>
+                    <p className="text-sm text-white/80">数据分级数</p>
+                    <p className="text-2xl font-bold text-white">8</p>
             </div>
                 </div>
               </div>
-                        </div>
+            </div>
             <div className="bg-white rounded-lg shadow mt-8">
               <div className="p-4 border-b border-gray-100">
                 <h3 className="text-base font-medium text-gray-700">数据资产访问链路图</h3>
-              </div>
+                        </div>
               <div className="p-2">
-                <ResourceFlowChart />
+                <div className="h-[320px]">
+                  <ResourceFlowChart />
+                </div>
                         </div>
             </div>
           </div>
