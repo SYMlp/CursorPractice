@@ -461,17 +461,7 @@ export const assetFlowChartData = {
     {
       id: 'app1',
       type: 'application',
-      position: { x: 100, y: 80 },
-      data: { 
-        label: '财务管理系统', 
-        details: '数据量: 9,865', 
-        type: 'application' 
-      }
-    },
-    {
-      id: 'app2',
-      type: 'application',
-      position: { x: 100, y: 180 },
+      position: { x: 50, y: 100 },
       data: { 
         label: '人力资源系统', 
         details: '数据量: 8,743', 
@@ -479,9 +469,9 @@ export const assetFlowChartData = {
       }
     },
     {
-      id: 'app3',
+      id: 'app2',
       type: 'application',
-      position: { x: 100, y: 280 },
+      position: { x: 50, y: 200 },
       data: { 
         label: '客户关系管理', 
         details: '数据量: 7,654', 
@@ -489,9 +479,9 @@ export const assetFlowChartData = {
       }
     },
     {
-      id: 'app4',
+      id: 'app3',
       type: 'application',
-      position: { x: 100, y: 380 },
+      position: { x: 50, y: 300 },
       data: { 
         label: '数据分析平台', 
         details: '数据量: 6,287', 
@@ -499,9 +489,9 @@ export const assetFlowChartData = {
       }
     },
     {
-      id: 'app5',
+      id: 'app4',
       type: 'application',
-      position: { x: 100, y: 480 },
+      position: { x: 50, y: 400 },
       data: { 
         label: '供应链管理系统', 
         details: '数据量: 5,932', 
@@ -509,11 +499,11 @@ export const assetFlowChartData = {
       }
     },
     
-    // 用户节点
+    // 用户节点 - 中间列
     {
       id: 'user1',
       type: 'user',
-      position: { x: 350, y: 50 },
+      position: { x: 350, y: 80 },
       data: { 
         label: '张三', 
         details: '研发部', 
@@ -523,7 +513,7 @@ export const assetFlowChartData = {
     {
       id: 'user2',
       type: 'user',
-      position: { x: 350, y: 150 },
+      position: { x: 350, y: 160 },
       data: { 
         label: '李四', 
         details: '财务部', 
@@ -533,7 +523,7 @@ export const assetFlowChartData = {
     {
       id: 'user3',
       type: 'user',
-      position: { x: 350, y: 250 },
+      position: { x: 350, y: 240 },
       data: { 
         label: '王五', 
         details: '市场部', 
@@ -543,7 +533,7 @@ export const assetFlowChartData = {
     {
       id: 'user4',
       type: 'user',
-      position: { x: 350, y: 350 },
+      position: { x: 350, y: 320 },
       data: { 
         label: '赵六', 
         details: '人力资源部', 
@@ -553,7 +543,7 @@ export const assetFlowChartData = {
     {
       id: 'user5',
       type: 'user',
-      position: { x: 350, y: 450 },
+      position: { x: 350, y: 400 },
       data: { 
         label: '钱七', 
         details: '销售部', 
@@ -561,21 +551,11 @@ export const assetFlowChartData = {
       }
     },
     
-    // 告警节点
+    // 告警节点 - 右侧列
     {
       id: 'alert1',
       type: 'alert',
-      position: { x: 600, y: 100 },
-      data: { 
-        label: '异常登录', 
-        details: '可疑IP访问', 
-        type: 'alert' 
-      }
-    },
-    {
-      id: 'alert2',
-      type: 'alert',
-      position: { x: 600, y: 200 },
+      position: { x: 650, y: 120 },
       data: { 
         label: '批量导出', 
         details: '敏感数据', 
@@ -583,9 +563,9 @@ export const assetFlowChartData = {
       }
     },
     {
-      id: 'alert3',
+      id: 'alert2',
       type: 'alert',
-      position: { x: 600, y: 300 },
+      position: { x: 650, y: 220 },
       data: { 
         label: '非法访问', 
         details: '越权操作', 
@@ -593,9 +573,9 @@ export const assetFlowChartData = {
       }
     },
     {
-      id: 'alert4',
+      id: 'alert3',
       type: 'alert',
-      position: { x: 600, y: 400 },
+      position: { x: 650, y: 320 },
       data: { 
         label: '频繁查询', 
         details: '短时多次访问', 
@@ -604,51 +584,35 @@ export const assetFlowChartData = {
     }
   ],
   edges: [
-    // 应用到用户的连线
+    // 应用到用户的连线 - 蓝色连线
     {
       id: 'e-app1-user1',
       source: 'app1',
       target: 'user1',
       animated: true,
       type: 'default',
-      style: { stroke: '#ff8c00', strokeWidth: 2 },
+      style: { stroke: '#3B82F6', strokeWidth: 2 },
       markerEnd: {
         type: MarkerType.ArrowClosed,
-        color: '#ff8c00',
+        color: '#3B82F6',
       },
       label: 'IP: 192.168.1.1',
       labelStyle: { fill: '#666', fontWeight: 500, fontSize: 10 },
       labelBgStyle: { fill: 'rgba(255, 255, 255, 0.8)' },
+      data: { accessCount: 123, risk: 'low' }
     },
     {
-      id: 'e-app1-user2',
+      id: 'e-app1-user4',
       source: 'app1',
-      target: 'user2',
+      target: 'user4',
       animated: true,
       type: 'default',
-      style: { stroke: '#ffa500', strokeWidth: 2 },
+      style: { stroke: '#3B82F6', strokeWidth: 2 },
       markerEnd: {
         type: MarkerType.ArrowClosed,
-        color: '#ffa500',
+        color: '#3B82F6',
       },
-      label: 'IP: 192.168.1.100',
-      labelStyle: { fill: '#666', fontWeight: 500, fontSize: 10 },
-      labelBgStyle: { fill: 'rgba(255, 255, 255, 0.8)' },
-    },
-    {
-      id: 'e-app2-user1',
-      source: 'app2',
-      target: 'user1',
-      animated: true,
-      type: 'default',
-      style: { stroke: '#ffa500', strokeWidth: 2 },
-      markerEnd: {
-        type: MarkerType.ArrowClosed,
-        color: '#ffa500',
-      },
-      label: 'IP: 192.168.2.45',
-      labelStyle: { fill: '#666', fontWeight: 500, fontSize: 10 },
-      labelBgStyle: { fill: 'rgba(255, 255, 255, 0.8)' },
+      data: { accessCount: 78, risk: 'low' }
     },
     {
       id: 'e-app2-user2',
@@ -656,29 +620,25 @@ export const assetFlowChartData = {
       target: 'user2',
       animated: true,
       type: 'default',
-      style: { stroke: '#ff4500', strokeWidth: 3 },
+      style: { stroke: '#3B82F6', strokeWidth: 2 },
       markerEnd: {
         type: MarkerType.ArrowClosed,
-        color: '#ff4500',
+        color: '#3B82F6',
       },
-      label: 'IP: 10.0.0.15',
-      labelStyle: { fill: '#666', fontWeight: 500, fontSize: 10 },
-      labelBgStyle: { fill: 'rgba(255, 255, 255, 0.8)' },
+      data: { accessCount: 156, risk: 'low' }
     },
     {
-      id: 'e-app3-user2',
-      source: 'app3',
-      target: 'user2',
+      id: 'e-app2-user3',
+      source: 'app2',
+      target: 'user3',
       animated: true,
       type: 'default',
-      style: { stroke: '#008000', strokeWidth: 2 },
+      style: { stroke: '#3B82F6', strokeWidth: 2 },
       markerEnd: {
         type: MarkerType.ArrowClosed,
-        color: '#008000',
+        color: '#3B82F6',
       },
-      label: 'IP: 172.16.5.87',
-      labelStyle: { fill: '#666', fontWeight: 500, fontSize: 10 },
-      labelBgStyle: { fill: 'rgba(255, 255, 255, 0.8)' },
+      data: { accessCount: 89, risk: 'low' }
     },
     {
       id: 'e-app3-user3',
@@ -686,119 +646,105 @@ export const assetFlowChartData = {
       target: 'user3',
       animated: true,
       type: 'default',
-      style: { stroke: '#ffa500', strokeWidth: 2 },
+      style: { stroke: '#3B82F6', strokeWidth: 2 },
       markerEnd: {
         type: MarkerType.ArrowClosed,
-        color: '#ffa500',
+        color: '#3B82F6',
       },
-      label: 'IP: 192.168.3.12',
-      labelStyle: { fill: '#666', fontWeight: 500, fontSize: 10 },
-      labelBgStyle: { fill: 'rgba(255, 255, 255, 0.8)' },
+      data: { accessCount: 112, risk: 'low' }
     },
     {
-      id: 'e-app4-user3',
-      source: 'app4',
-      target: 'user3',
-      animated: true,
-      type: 'default',
-      style: { stroke: '#ff8c00', strokeWidth: 2 },
-      markerEnd: {
-        type: MarkerType.ArrowClosed,
-        color: '#ff8c00',
-      },
-      label: 'IP: 192.168.4.25',
-      labelStyle: { fill: '#666', fontWeight: 500, fontSize: 10 },
-      labelBgStyle: { fill: 'rgba(255, 255, 255, 0.8)' },
-    },
-    {
-      id: 'e-app4-user4',
-      source: 'app4',
-      target: 'user4',
-      animated: true,
-      type: 'default',
-      style: { stroke: '#008000', strokeWidth: 2 },
-      markerEnd: {
-        type: MarkerType.ArrowClosed,
-        color: '#008000',
-      }
-    },
-    {
-      id: 'e-app5-user4',
-      source: 'app5',
-      target: 'user4',
-      animated: true,
-      type: 'default',
-      style: { stroke: '#ffa500', strokeWidth: 2 },
-      markerEnd: {
-        type: MarkerType.ArrowClosed,
-        color: '#ffa500',
-      }
-    },
-    {
-      id: 'e-app5-user5',
-      source: 'app5',
+      id: 'e-app3-user5',
+      source: 'app3',
       target: 'user5',
       animated: true,
       type: 'default',
-      style: { stroke: '#ff8c00', strokeWidth: 2 },
+      style: { stroke: '#3B82F6', strokeWidth: 2 },
       markerEnd: {
         type: MarkerType.ArrowClosed,
-        color: '#ff8c00',
+        color: '#3B82F6',
       },
-      label: 'IP: 10.10.5.89',
-      labelStyle: { fill: '#666', fontWeight: 500, fontSize: 10 },
-      labelBgStyle: { fill: 'rgba(255, 255, 255, 0.8)' },
+      data: { accessCount: 67, risk: 'low' }
+    },
+    {
+      id: 'e-app4-user5',
+      source: 'app4',
+      target: 'user5',
+      animated: true,
+      type: 'default',
+      style: { stroke: '#3B82F6', strokeWidth: 2 },
+      markerEnd: {
+        type: MarkerType.ArrowClosed,
+        color: '#3B82F6',
+      },
+      data: { accessCount: 94, risk: 'low' }
     },
     
-    // 告警到节点的连线
+    // 用户到告警的连线 - 红色告警连线
     {
-      id: 'e-alert1-app1',
-      source: 'alert1',
-      target: 'app1',
+      id: 'e-user2-alert1',
+      source: 'user2',
+      target: 'alert1',
       type: 'default',
-      style: { stroke: '#ff4500', strokeWidth: 2, strokeDasharray: '5 5' }
+      animated: true,
+      style: { stroke: '#EF4444', strokeWidth: 2 },
+      markerEnd: {
+        type: MarkerType.ArrowClosed,
+        color: '#EF4444',
+      },
+      data: { alertType: '批量导出', severity: 'high' }
     },
     {
-      id: 'e-alert1-user1',
-      source: 'alert1',
-      target: 'user1',
+      id: 'e-user3-alert2',
+      source: 'user3',
+      target: 'alert2',
       type: 'default',
-      style: { stroke: '#ff8c00', strokeWidth: 2, strokeDasharray: '5 5' }
+      animated: true,
+      style: { stroke: '#EF4444', strokeWidth: 2 },
+      markerEnd: {
+        type: MarkerType.ArrowClosed,
+        color: '#EF4444',
+      },
+      data: { alertType: '非法访问', severity: 'medium' }
     },
     {
-      id: 'e-alert2-app2',
-      source: 'alert2',
-      target: 'app2',
+      id: 'e-user5-alert3',
+      source: 'user5',
+      target: 'alert3',
       type: 'default',
-      style: { stroke: '#ff8c00', strokeWidth: 2, strokeDasharray: '5 5' }
+      animated: true,
+      style: { stroke: '#EF4444', strokeWidth: 2 },
+      markerEnd: {
+        type: MarkerType.ArrowClosed,
+        color: '#EF4444',
+      },
+      data: { alertType: '频繁查询', severity: 'medium' }
+    },
+    
+    // 应用到告警的连线 - 虚线告警关联
+    {
+      id: 'e-app2-alert1',
+      source: 'app2',
+      target: 'alert1',
+      type: 'default',
+      style: { stroke: '#EF4444', strokeWidth: 1.5, strokeDasharray: '5 5' },
+      data: { relationType: '告警关联' }
     },
     {
-      id: 'e-alert2-user2',
-      source: 'alert2',
-      target: 'user2',
+      id: 'e-app2-alert2',
+      source: 'app2',
+      target: 'alert2',
       type: 'default',
-      style: { stroke: '#ff4500', strokeWidth: 2, strokeDasharray: '5 5' }
+      style: { stroke: '#EF4444', strokeWidth: 1.5, strokeDasharray: '5 5' },
+      data: { relationType: '告警关联' }
     },
     {
-      id: 'e-alert3-app3',
-      source: 'alert3',
-      target: 'app3',
+      id: 'e-app3-alert3',
+      source: 'app3',
+      target: 'alert3',
       type: 'default',
-      style: { stroke: '#ffa500', strokeWidth: 2, strokeDasharray: '5 5' }
-    },
-    {
-      id: 'e-alert3-user3',
-      source: 'alert3',
-      target: 'user3',
-      type: 'default',
-      style: { stroke: '#ff8c00', strokeWidth: 2, strokeDasharray: '5 5' }
-    },
-    {
-      id: 'e-alert4-app5',
-      source: 'alert4',
-      target: 'app5',
-      type: 'default',
-      style: { stroke: '#ff8c00', strokeWidth: 2, strokeDasharray: '5 5' }
+      style: { stroke: '#EF4444', strokeWidth: 1.5, strokeDasharray: '5 5' },
+      data: { relationType: '告警关联' }
     }
   ]
 };

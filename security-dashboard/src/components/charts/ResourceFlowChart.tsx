@@ -25,7 +25,7 @@ import {
   ApplicationNode,
   TaskNode,
   PersonNode
-} from '../nodes';
+} from '../networks/nodes';
 
 // 自定义节点类型
 const nodeTypes: NodeTypes = {

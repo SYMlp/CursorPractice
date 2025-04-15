@@ -89,6 +89,109 @@
 - 资源类型占比
 - 业务行业分布
 
+## TopRankingCard
+
+通用排名展示组件，支持多种展示方式（表格、柱状图、条形图、饼图、环形图等）。
+
+### 特性
+
+- 支持多种展示形式：表格、柱状图、水平条形图、饼图、环形图、进度条
+- 统一的标题和数据展示风格
+- 灵活的配置选项
+- 支持点击交互
+- 响应式布局
+- 支持自适应容器高度
+
+### 参数
+
+| 参数 | 类型 | 默认值 | 说明 |
+|------|------|--------|------|
+| title | string | - | 排名卡片标题 |
+| data | RankingItem[] | [] | 排名数据 |
+| total | number | - | 数据总数（用于显示"共计X个"） |
+| chartType | 'bar' \| 'horizontal-bar' \| 'pie' \| 'donut' \| 'table' \| 'progress-bar' | 'progress-bar' | 图表类型 |
+| maxItems | number | 5 | 最多显示项目数 |
+| valueLabel | string | '值' | 值的标签名 |
+| valueFormatter | function | (value) => value.toLocaleString() | 值的格式化函数 |
+| height | number \| string | 280 | 图表高度（当fitContainer为false时使用） |
+| onClick | function | - | 点击项目时的回调函数 |
+| moreLink | string | - | "更多"链接地址 |
+| loading | boolean | false | 是否显示加载状态 |
+| className | string | '' | 额外的CSS类名 |
+| showRank | boolean | true | 是否显示排名 |
+| showHeader | boolean | true | 是否显示标题栏 |
+| showProgress | boolean | true | 是否显示进度条（进度条模式下） |
+| fitContainer | boolean | false | 是否自适应容器高度，设置为true时会自动填充父容器空间 |
+
+### 使用示例
+
+```tsx
+// 进度条样式（自适应容器高度）
+<TopRankingCard
+  title="数据交互量应用TOP"
+  data={applicationInteractionRankData}
+  total={21}
+  maxItems={5}
+  chartType="progress-bar"
+  valueLabel="交互量"
+  moreLink="#"
+  fitContainer={true}
+/>
+
+// 柱状图样式（固定高度）
+<TopRankingCard
+  title="频繁登录用户TOP"
+  data={frequentLoginUserRankData}
+  total={21}
+  maxItems={5}
+  chartType="bar"
+  valueLabel="登录次数"
+  height={280}
+  moreLink="#"
+/>
+
+// 水平条形图样式
+<TopRankingCard
+  title="风险最多业务应用TOP"
+  data={riskBusinessRankData}
+  total={21}
+  maxItems={5}
+  chartType="horizontal-bar"
+  valueLabel="风险数"
+  moreLink="#"
+  fitContainer={true}
+/>
+
+// 表格样式
+<TopRankingCard
+  title="数据使用风险最多人员TOP"
+  data={riskUserRankData}
+  total={21}
+  maxItems={5}
+  chartType="table"
+  valueLabel="风险数"
+  moreLink="#"
+  fitContainer={true}
+/>
+
+// 环形图样式（作为嵌套组件使用）
+<div className="h-full flex flex-col">
+  <div className="flex justify-between items-center mb-3">
+    <h3 className="text-base font-medium text-gray-700">告警类型分布</h3>
+    <TimeRangeSelector currentRange={timeRange} onChange={handleChange} />
+  </div>
+  <div className="flex-grow">
+    <TopRankingCard
+      title=""
+      data={alarmTypeDistributionData}
+      chartType="donut"
+      showHeader={false}
+      fitContainer={true}
+    />
+  </div>
+</div>
+```
+
 ## 使用注意事项
 
 1. **响应式设计**：所有图表组件均支持容器大小变化，会自动调整尺寸

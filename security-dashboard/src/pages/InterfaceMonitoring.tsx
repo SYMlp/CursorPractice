@@ -1,6 +1,6 @@
 import React from 'react';
 import MetricCard from '../components/cards/MetricCard';
-import NetworkTopology from '../components/charts/NetworkTopology';
+import NetworkTopology from '../components/networks/NetworkTopology';
 import MultiLineChart from '../components/charts/MultiLineChart';
 import { 
   ServerIcon, 

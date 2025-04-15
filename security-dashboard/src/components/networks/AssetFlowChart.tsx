@@ -14,6 +14,8 @@ import ReactFlow, {
   applyNodeChanges,
   applyEdgeChanges,
   ReactFlowProvider,
+  MiniMap,
+  Panel
 } from 'reactflow';
 import 'reactflow/dist/style.css';
 
@@ -59,7 +61,7 @@ const AssetNode: React.FC<any> = ({ data }) => {
   };
 
   return (
-    <div className={`px-3 py-2 rounded-lg border-2 shadow-sm ${getNodeStyle()}`}>
+    <div className={`px-3 py-2 rounded-lg border-2 shadow-md hover:shadow-lg transition-shadow ${getNodeStyle()}`}>
       <div className="flex items-center text-sm font-medium">
         {getIcon()}
         <span>{data.label}</span>
@@ -82,9 +84,24 @@ const nodeTypes: NodeTypes = {
 interface AssetFlowChartProps {
   nodes?: Node[];
   edges?: Edge[];
+  onNodeClick?: (node: Node) => void;
+  onEdgeClick?: (edge: Edge) => void;
 }
 
-const AssetFlowChartContent: React.FC<AssetFlowChartProps> = ({ nodes, edges }) => {
+// 风险等级颜色映射
+const riskColorMap: Record<string, string> = {
+  high: '#EF4444', // 高风险 - 红色
+  medium: '#F59E0B', // 中风险 - 橙色
+  low: '#3B82F6',  // 低风险 - 蓝色
+  default: '#9CA3AF' // 默认 - 灰色
+};
+
+const AssetFlowChartContent: React.FC<AssetFlowChartProps> = ({ 
+  nodes, 
+  edges, 
+  onNodeClick: externalNodeClickHandler,
+  onEdgeClick: externalEdgeClickHandler
+}) => {
   // 使用useMemo确保初始值在组件重新渲染时不会重置
   const initialNodes = useMemo(() => nodes || [], []);
   const initialEdges = useMemo(() => edges || [], []);
@@ -94,6 +111,7 @@ const AssetFlowChartContent: React.FC<AssetFlowChartProps> = ({ nodes, edges }) 
   const [flowEdges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
   const [selectedNode, setSelectedNode] = useState<Node | null>(null);
   const [selectedEdge, setSelectedEdge] = useState<Edge | null>(null);
+  const [showMiniMap, setShowMiniMap] = useState<boolean>(true);
 
   // 当props变化时更新图表数据
   useEffect(() => {
@@ -124,18 +142,37 @@ const AssetFlowChartContent: React.FC<AssetFlowChartProps> = ({ nodes, edges }) 
     console.log('Node clicked:', node);
     setSelectedNode(node);
     setSelectedEdge(null);
-  }, []);
+    
+    if (externalNodeClickHandler) {
+      externalNodeClickHandler(node);
+    }
+  }, [externalNodeClickHandler]);
 
   // 边点击事件处理
   const onEdgeClick = useCallback((event: React.MouseEvent, edge: Edge) => {
     console.log('Edge clicked:', edge);
     setSelectedEdge(edge);
     setSelectedNode(null);
-  }, []);
+    
+    if (externalEdgeClickHandler) {
+      externalEdgeClickHandler(edge);
+    }
+  }, [externalEdgeClickHandler]);
+
+  // 风格配置对象
+  const edgeOptions = useMemo(() => ({
+    type: 'smoothstep', // 平滑折线类型
+    animated: true,
+    style: { stroke: '#3B82F6', strokeWidth: 2 },
+    markerEnd: {
+      type: MarkerType.ArrowClosed,
+      color: '#3B82F6',
+    }
+  }), []);
 
   return (
     <div className="flex flex-col w-full h-full">
-      <div className="w-full h-full" style={{ border: '1px solid #eaeaea', borderRadius: '4px' }}>
+      <div className="w-full h-full" style={{ border: '1px solid #eaeaea', borderRadius: '8px' }}>
         {flowNodes.length > 0 && flowEdges.length > 0 ? (
           <ReactFlow
             nodes={flowNodes}
@@ -153,18 +190,52 @@ const AssetFlowChartContent: React.FC<AssetFlowChartProps> = ({ nodes, edges }) 
             nodesDraggable={true}
             nodesConnectable={false}
             elementsSelectable={true}
-            defaultEdgeOptions={{
-              type: 'smoothstep',
-              animated: true,
-              style: { stroke: '#1d4ed8', strokeWidth: 2 },
-              markerEnd: {
-                type: MarkerType.ArrowClosed,
-                color: '#1d4ed8',
-              }
-            }}
+            defaultEdgeOptions={edgeOptions}
+            proOptions={{ hideAttribution: true }}
           >
             <Background color="#f1f5f9" size={1.5} />
-            <Controls showInteractive={false} position="bottom-right" />
+            <Controls className="bg-white shadow-md rounded-md border border-gray-200" showInteractive={false} position="bottom-right" />
+            {showMiniMap && (
+              <MiniMap 
+                nodeStrokeWidth={3}
+                zoomable
+                pannable
+                nodeColor={(node) => {
+                  switch (node.type) {
+                    case 'application': return '#3B82F6';
+                    case 'user': return '#10B981';
+                    case 'alert': return '#EF4444';
+                    default: return '#9CA3AF';
+                  }
+                }}
+                style={{
+                  height: 120,
+                  width: 160,
+                  right: 10,
+                  top: 10,
+                  background: 'rgba(255, 255, 255, 0.9)',
+                  border: '1px solid #e2e8f0',
+                  borderRadius: '6px',
+                  boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
+                }}
+              />
+            )}
+            <Panel position="top-left" className="bg-white p-2 rounded-md shadow-sm border border-gray-200">
+              <div className="flex items-center space-x-4 text-xs">
+                <div className="flex items-center">
+                  <div className="w-3 h-3 rounded-full bg-blue-500 mr-1"></div>
+                  <span>应用系统</span>
+                </div>
+                <div className="flex items-center">
+                  <div className="w-3 h-3 rounded-full bg-green-500 mr-1"></div>
+                  <span>用户</span>
+                </div>
+                <div className="flex items-center">
+                  <div className="w-3 h-3 rounded-full bg-red-500 mr-1"></div>
+                  <span>告警</span>
+                </div>
+              </div>
+            </Panel>
           </ReactFlow>
         ) : (
           <div className="w-full h-full flex items-center justify-center text-gray-400">
@@ -180,7 +251,7 @@ const AssetFlowChartContent: React.FC<AssetFlowChartProps> = ({ nodes, edges }) 
 
       {/* 显示选中节点或边的详细信息 */}
       {(selectedNode || selectedEdge) && (
-        <div className="mt-4 p-4 bg-gray-50 rounded-lg border border-gray-200 shadow">
+        <div className="mt-4 p-4 bg-white rounded-lg border border-gray-200 shadow">
           <h3 className="text-lg font-semibold text-gray-800 mb-2">
             {selectedNode ? '节点详情' : '连接详情'}
           </h3>
@@ -210,10 +281,20 @@ const AssetFlowChartContent: React.FC<AssetFlowChartProps> = ({ nodes, edges }) 
                   <span className="font-medium">连接：</span>
                   <span>从 "{flowNodes.find(n => n.id === selectedEdge.source)?.data?.label}" 到 "{flowNodes.find(n => n.id === selectedEdge.target)?.data?.label}"</span>
                 </div>
-                {selectedEdge.data && Object.keys(selectedEdge.data).length > 0 && (
+                {selectedEdge.label && (
+                  <div className="col-span-2">
+                    <span className="font-medium">标签：</span>
+                    <span>{selectedEdge.label}</span>
+                  </div>
+                )}
+                {selectedEdge.data && typeof selectedEdge.data === 'object' && Object.keys(selectedEdge.data).length > 0 && (
                   <div className="col-span-2">
                     <span className="font-medium">详情：</span>
-                    <pre className="mt-1 text-xs whitespace-pre-wrap">{JSON.stringify(selectedEdge.data, null, 2)}</pre>
+                    <ul className="mt-1 list-disc list-inside text-sm">
+                      {Object.entries(selectedEdge.data as Record<string, any>).map(([key, value]) => (
+                        <li key={key}><span className="text-gray-600">{key}:</span> {String(value)}</li>
+                      ))}
+                    </ul>
                   </div>
                 )}
               </>

@@ -15,10 +15,22 @@
   - `CircularProgress.tsx`: 环形进度图，显示百分比完成情况 (用于平台概览页)
   - `LineChart.tsx`: 折线图，展示时间序列数据 (用于多个页面)
   - `MultiLineChart.tsx`: 多线折线图，比较多组时间序列数据 (用于接口监控页)
-  - `NetworkTopology.tsx`: 网络拓扑图，展示网络连接关系 (用于接口监控页)
   - `PieChart.tsx`: 饼图/环图，展示占比分布 (用于平台概览页和资产监测页)
-  - `ResourceFlowChart.tsx`: 资源流程图，展示复杂资源关系和数据流 (用于数据资产防护页)
+  - `DonutChart.tsx`: 环形图，用于展示占比数据 (用于多个页面)
+  - `EnhancedDonutChart.tsx`: 增强型环形图，展示告警类型分布等 (用于资产监测页)
+  - `TopRankingCard.tsx`: 排名卡片组件，展示TOP数据 (用于资产监测页)
   
+- `/networks`: 网络与流程图组件
+  - `AssetFlowChart.tsx`: 资产流程图，展示应用、用户和告警之间的关系
+  - `ResourceFlowChart.tsx`: 资源流程图，展示复杂资源关系和数据流
+  - `NetworkTopology.tsx`: 网络拓扑图，展示网络连接关系 (用于接口监控页)
+  - `/nodes`: 节点组件，用于流程图的自定义节点
+     - `PersonNode.tsx`: 人员节点
+     - `ApplicationNode.tsx`: 应用节点
+     - `ServiceNode.tsx`: 服务节点
+     - `ResourceNode.tsx`: 资源节点
+     - `TaskNode.tsx`: 任务节点
+
 - `/icons`: 图标组件
   - `Icons.tsx`: 基础图标集合
   - `AssetIcons.tsx`: 资产相关图标
@@ -30,18 +42,90 @@
     - `CapabilityTag`: 能力标签，展示防护能力类型
     - `CustomTooltip`: 提示组件，处理长文本的悬浮提示
 
-- `/nodes`: 节点组件
-  - `PersonNode.tsx`: 人员节点
-  - `ApplicationNode.tsx`: 应用节点
-  - `ServiceNode.tsx`: 服务节点
-  - `ResourceNode.tsx`: 资源节点
-  - `TaskNode.tsx`: 任务节点
+## AssetFlowChart 组件详细说明
 
-- `AssetFlowChart.tsx`: 资产流程图，用于展示简化的资产和用户关系，支持风险等级标识
-  - 支持三种节点类型：application(应用)、user(用户)、alert(告警)
-  - 支持五种风险等级连线样式：extreme(极高风险)、high(高风险)、medium(中等风险)、low(低风险)、collaboration(协作关系)
-  - 支持连线上显示IP地址等辅助信息
-  - 适用于应用监控大屏中央关系图区域
+`AssetFlowChart` 组件是基于 ReactFlow 库开发的资产访问关系图组件，用于可视化展示应用系统、用户和告警事件之间的交互关系。该组件高度可定制，具有丰富的交互功能和美观的视觉效果。
+
+### 组件特性
+
+1. **多种节点类型**
+   - 应用节点(application)：表示业务应用系统，如人力资源系统、客户关系管理系统等
+   - 用户节点(user)：表示访问应用的用户，包含部门信息
+   - 告警节点(alert)：表示系统检测到的安全告警事件
+
+2. **差异化连线样式**
+   - 正常访问关系：蓝色实线，表示用户对应用的常规访问
+   - 告警关联关系：红色实线，表示用户与告警的直接关联
+   - 告警溯源关系：红色虚线，表示应用与告警的间接关联
+
+3. **丰富的交互功能**
+   - 节点拖拽：支持节点自由移动，调整布局
+   - 缩放平移：通过鼠标滚轮和拖拽调整视图
+   - 细节查看：点击节点或连线显示详细信息
+   - 小地图导航：提供整体视图，便于定位和导航
+   - 图例说明：清晰标识不同类型节点的含义
+
+4. **视觉美化**
+   - 差异化颜色：不同类型节点使用不同颜色区分
+   - 动画效果：连线动画、交互反馈
+   - 悬停效果：鼠标悬停时显示阴影增强
+   - 圆角设计：节点采用圆角矩形设计，更加柔和美观
+
+### 使用示例
+
+```jsx
+import AssetFlowChart from '../components/networks/AssetFlowChart';
+
+// 组件中使用
+<div className="h-[calc(100%-3.5rem)]">
+  <AssetFlowChart 
+    nodes={assetFlowChartData.nodes}
+    edges={assetFlowChartData.edges}
+    onNodeClick={handleNodeClick}
+    onEdgeClick={handleEdgeClick}
+  />
+</div>
+```
+
+### 数据格式
+
+**节点数据格式**:
+```typescript
+{
+  id: string,            // 节点唯一标识
+  type: 'application' | 'user' | 'alert', // 节点类型
+  position: { x: number, y: number }, // 节点位置
+  data: {                // 节点数据
+    label: string,       // 节点标签文本
+    details: string,     // 节点详细信息
+    type: string         // 节点类型(冗余)
+  }
+}
+```
+
+**连线数据格式**:
+```typescript
+{
+  id: string,            // 连线唯一标识
+  source: string,        // 源节点ID
+  target: string,        // 目标节点ID
+  animated: boolean,     // 是否启用动画
+  type: string,          // 连线类型
+  style: {               // 连线样式
+    stroke: string,      // 线条颜色
+    strokeWidth: number, // 线条宽度
+    strokeDasharray?: string // 虚线样式
+  },
+  label?: string,        // 连线标签
+  data?: {               // 连线额外数据
+    accessCount?: number, // 访问次数
+    risk?: string,        // 风险等级
+    alertType?: string,   // 告警类型
+    severity?: string,    // 严重程度
+    relationType?: string // 关联类型
+  }
+}
+```
 
 ## 各页面使用组件列表
 
