@@ -1,0 +1,38 @@
+# 构建产物和依赖
+/build
+/node_modules
+/coverage
+/dist
+
+# 开发工具文件
+/.git
+/.github
+/.vscode
+/.idea
+.DS_Store
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# 大型二进制文件
+*.7z
+*.zip
+*.gz
+*.tar
+*.rar
+
+# 测试文件
+/test
+/tests
+/e2e
+/__tests__
+*.test.js
+*.spec.js
+
+# 其他不需要的文件
+/.env.local
+/.env.development
+/.env.development.local
+/.env.test
+/.env.test.local 

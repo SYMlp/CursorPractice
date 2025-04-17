@@ -14,6 +14,7 @@ interface LineChartProps {
   series: DataSeries[];
   showLegend?: boolean;
   height?: number | string;
+  legendPosition?: 'top' | 'bottom';
 }
 
 const LineChart: React.FC<LineChartProps> = ({ 
@@ -21,7 +22,8 @@ const LineChart: React.FC<LineChartProps> = ({
   xAxisData, 
   series, 
   showLegend = false,
-  height = 250
+  height = 250,
+  legendPosition = 'bottom'
 }) => {
   // 预定义的颜色数组，用于没有指定颜色的系列
   const colorPalette = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6'];
@@ -54,7 +56,7 @@ const LineChart: React.FC<LineChartProps> = ({
     },
     legend: {
       show: showLegend,
-      bottom: 0,
+      [legendPosition]: legendPosition === 'bottom' ? 0 : 5,
       textStyle: {
         color: '#6b7280',
         fontSize: 10
@@ -67,8 +69,8 @@ const LineChart: React.FC<LineChartProps> = ({
     grid: {
       left: '3%',
       right: '4%',
-      bottom: showLegend ? '12%' : '8%',
-      top: title ? '12%' : '8%',
+      bottom: showLegend && legendPosition === 'bottom' ? '12%' : '8%',
+      top: (title || (showLegend && legendPosition === 'top')) ? '12%' : '8%',
       containLabel: true
     },
     xAxis: {

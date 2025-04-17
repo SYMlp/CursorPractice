@@ -76,7 +76,7 @@ const DataAssetMonitoring: React.FC = () => {
         </div>
         
         {/* 上部分内容 - 左右布局 */}
-        <div className="grid grid-cols-12 gap-4 mb-4" style={{ height: '480px' }}>
+        <div className="grid grid-cols-12 gap-4 mb-4" style={{ height: '420px' }}>
           {/* 左侧 - 访问关系图及数据统计 */}
           <div className="col-span-8 flex flex-col h-full overflow-hidden">
             <div className="grid grid-cols-3 gap-4 mb-4 flex-none">
@@ -85,27 +85,27 @@ const DataAssetMonitoring: React.FC = () => {
                   key={index}
                   label={stat.label}
                   value={stat.value}
-                  className="bg-gray-50"
+                  className="bg-white shadow-sm border border-gray-100 rounded-lg"
                 />
               ))}
             </div>
             
             {/* 资源访问关系图 */}
             <div className="bg-white rounded-lg shadow flex-1 flex flex-col overflow-hidden min-h-0">
-              <div className="p-2 flex flex-col h-full">
+              <div className="p-3 flex flex-col h-full">
                 {/* 说明信息区域 */}
-                <div className="h-6 mb-1 flex items-center">
+                <div className="flex-none border-b border-gray-100 pb-2 mb-2 flex items-center">
                   <svg className="w-4 h-4 text-blue-500 flex-shrink-0" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                   </svg>
                   <span className="text-blue-500 font-medium text-xs ml-1">资源链路：</span>
-                  <span className="text-gray-600 text-[11px]">
-                    该展示选择的时间内的各资源访问关系图，包含访问链路，链条涉及用户、任务、应用、服务、数据，链条区分有风险、没有风险信息，资源悬浮展示资源名称、访问次数、风险数
+                  <span className="text-gray-600 text-xs ml-1">
+                    涉及用户、任务、应用、服务、数据资源，区分风险/无风险连接，悬浮可查看详情
                   </span>
                 </div>
                 
                 {/* 资源流程图 */}
-                <div className="flex-1 min-h-0">
+                <div className="flex-1 min-h-0 border border-gray-100 rounded-md">
                   <ResourceFlowChart 
                     initialNodes={nodes}
                     initialEdges={edges}
@@ -117,7 +117,9 @@ const DataAssetMonitoring: React.FC = () => {
                 </div>
                 
                 {/* 图例说明 */}
-                <ResourceFlowLegend />
+                <div className="flex-none mt-2 pt-2 border-t border-gray-100">
+                  <ResourceFlowLegend />
+                </div>
               </div>
             </div>
           </div>
@@ -125,7 +127,7 @@ const DataAssetMonitoring: React.FC = () => {
           {/* 右侧 - 排行榜区域 */}
           <div className="col-span-4 flex flex-col h-full overflow-hidden">
             {/* 风险最多数据资源TOP */}
-            <div className="flex-1 mb-4">
+            <div className="flex-none" style={{ height: '45%' }}>
               <TableTopCard
                 title="风险最多数据资源TOP"
                 data={storageRiskResourceTableData}
@@ -136,11 +138,12 @@ const DataAssetMonitoring: React.FC = () => {
                 progressBarField="riskValue"
                 onItemClick={handleRankingItemClick}
                 className="h-full"
+                maxItems={5}
               />
             </div>
             
             {/* 高风险数据使用风险最多人TOP */}
-            <div className="flex-1">
+            <div className="flex-none mt-4" style={{ height: '52%' }}>
               <TableTopCard
                 title="高敏数据使用风险最多人TOP"
                 data={highRiskUserTableData}
@@ -151,13 +154,14 @@ const DataAssetMonitoring: React.FC = () => {
                 progressBarField="threatValue"
                 onItemClick={handleRankingItemClick}
                 className="h-full"
+                maxItems={8}
               />
             </div>
           </div>
         </div>
         
         {/* 下部分内容 - 左右布局 */}
-        <div className="grid grid-cols-12 gap-4" style={{ height: '320px' }}>
+        <div className="grid grid-cols-12 gap-4" style={{ height: '360px' }}>
           {/* 左侧 - 存储风险和防护能力缺失的TOP榜单 */}
           <div className="col-span-6 grid grid-cols-2 gap-4">
             {/* 存在存储风险的数据资源TOP */}
@@ -180,6 +184,8 @@ const DataAssetMonitoring: React.FC = () => {
               ]}
               showProgressBar={false}
               onItemClick={handleRankingItemClick}
+              className="h-full shadow"
+              maxItems={7}
             />
             
             {/* 存在防护能力缺失的数据资源TOP */}
@@ -200,20 +206,24 @@ const DataAssetMonitoring: React.FC = () => {
               ]}
               showProgressBar={false}
               onItemClick={handleRankingItemClick}
+              className="h-full shadow"
+              maxItems={7}
             />
           </div>
           
           {/* 右侧 - 风险类型趋势图 */}
           <div className="col-span-6 bg-white rounded-lg shadow p-4 flex flex-col h-full">
-            <div className="border-b border-gray-200 pb-2 mb-4">
+            <div className="border-b border-gray-200 pb-2 mb-3 flex justify-between items-center">
               <div className="text-base font-medium">最常发生的风险类型趋势</div>
+              <div className="text-xs text-gray-500">时间范围: 今日</div>
             </div>
-            <div className="flex-grow">
+            <div className="flex-grow pb-6">
               <LineChart
                 title=""
                 xAxisData={riskTrendData.xAxis}
                 series={riskTrendData.series}
                 showLegend={true}
+                legendPosition="top"
                 height="100%"
               />
             </div>

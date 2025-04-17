@@ -140,6 +140,56 @@ npm start
 npm run build
 ```
 
+### 使用Docker部署
+
+项目支持使用Docker进行部署，提供了以下文件：
+
+- `Dockerfile` - 用于构建Docker镜像
+- `docker-compose.yml` - 简化部署流程
+- `docker/nginx.conf` - Nginx配置文件
+- `deploy.sh` - 部署脚本
+
+#### 快速部署
+
+1. 构建Docker镜像：
+
+```bash
+./deploy.sh build
+```
+
+2. 启动容器：
+
+```bash
+./deploy.sh start
+```
+
+3. 查看部署状态：
+
+```bash
+./deploy.sh status
+```
+
+4. 查看更多命令：
+
+```bash
+./deploy.sh help
+```
+
+#### 手动部署
+
+如果不使用部署脚本，也可以直接使用docker-compose命令：
+
+```bash
+# 构建镜像
+docker-compose build
+
+# 启动容器
+docker-compose up -d
+
+# 停止容器
+docker-compose down
+```
+
 ## 模拟数据与真实API切换
 
 1. 开发阶段：默认使用模拟数据（REACT_APP_USE_MOCK=true）

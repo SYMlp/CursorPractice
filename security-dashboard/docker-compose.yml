@@ -1,0 +1,20 @@
+version: '3'
+
+services:
+  security-dashboard:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "80:80"
+    restart: unless-stopped
+    container_name: security-dashboard
+    volumes:
+      # 挂载环境变量文件
+      - ./.env.production:/usr/share/nginx/html/.env
+    networks:
+      - security-network
+
+networks:
+  security-network:
+    driver: bridge 

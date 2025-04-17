@@ -154,8 +154,8 @@ const TableTopCard: React.FC<TableTopCardProps> = ({
   };
   
   return (
-    <div className={`bg-white rounded-lg shadow ${className}`}>
-      <div className="border-b border-gray-200 px-4 py-2 flex justify-between items-center">
+    <div className={`bg-white rounded-lg shadow flex flex-col h-full ${className}`}>
+      <div className="border-b border-gray-200 px-4 py-2 flex justify-between items-center flex-none">
         <div className="text-sm font-medium flex items-center">
           <span>{title}</span>
           <span className="text-xs text-gray-500 ml-2">总计{data.length}个</span>
@@ -171,9 +171,9 @@ const TableTopCard: React.FC<TableTopCardProps> = ({
         </button>
       </div>
       
-      <div className="overflow-hidden">
+      <div className="overflow-hidden flex-grow flex flex-col">
         {/* 表头 */}
-        <div className="px-4 py-2 border-b border-gray-100 flex text-xs font-medium text-gray-500">
+        <div className="px-4 py-2 border-b border-gray-100 flex text-xs font-medium text-gray-500 flex-none">
           {showRankNumber && (
             <div className="w-8">#</div>
           )}
@@ -192,11 +192,11 @@ const TableTopCard: React.FC<TableTopCardProps> = ({
         </div>
         
         {/* 表格内容 */}
-        <div className="px-2">
+        <div className="px-2 overflow-auto flex-grow">
           {displayData.map((item, index) => (
             <div 
               key={item.id} 
-              className="py-2 px-2 border-b border-gray-100 last:border-b-0 hover:bg-gray-50 cursor-pointer flex items-center"
+              className="py-1.5 px-2 border-b border-gray-100 last:border-b-0 hover:bg-gray-50 cursor-pointer flex items-center"
               onClick={() => onItemClick && onItemClick(item)}
             >
               {showRankNumber && (
