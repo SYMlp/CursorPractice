@@ -1,0 +1,203 @@
+/* Placeholder for merged global styles */
+
+/* Combined styles from index.css and App.css */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  margin: 0;
+  font-family:
+    -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell',
+    'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
+}
+
+/* Styles from App.css */
+.App {
+  text-align: center;
+}
+
+.App-logo {
+  height: 40vmin;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .App-logo {
+    animation: App-logo-spin infinite 20s linear;
+  }
+}
+
+.App-header {
+  background-color: #282c34;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(10px + 2vmin);
+  color: white;
+}
+
+.App-link {
+  color: #61dafb;
+}
+
+@keyframes App-logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* 防止内容溢出的全局样式 */
+* {
+  box-sizing: border-box;
+}
+
+/* 确保所有容器有明确的内容溢出处理 */
+.card,
+.bg-white,
+.rounded-lg,
+.shadow {
+  overflow: hidden;
+}
+
+/* 确保文字不会溢出其容器 */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p,
+span,
+div {
+  max-width: 100%;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
+
+/* 确保数值显示不会溢出 */
+.text-lg,
+.text-xl,
+.text-2xl,
+.text-3xl,
+.text-4xl,
+.font-semibold,
+.font-bold {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* 优化图标显示 */
+svg,
+img {
+  max-width: 100%;
+  height: auto;
+  display: inline-block;
+  vertical-align: middle;
+}
+
+/* 紧凑布局样式 */
+.compact-layout {
+  --card-padding: 0.5rem;
+  --card-gap: 0.5rem;
+}
+
+/* 添加安全系统蓝色主题 */
+:root {
+  --security-blue: #1e40af;
+  --security-light-blue: #3b82f6;
+}
+
+.node {
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 10px;
+  width: 180px;
+  background-color: white;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.node-content {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.node-header {
+  font-weight: bold;
+  padding: 4px 8px;
+  border-radius: 4px;
+  text-align: center;
+  margin-bottom: 8px;
+}
+
+.node-label {
+  font-size: 14px;
+  font-weight: 500;
+  margin-bottom: 5px;
+}
+
+.risk-score,
+.risk-level {
+  font-size: 12px;
+  color: #666;
+}
+
+/* 节点类型样式 */
+.node-header.resource {
+  background-color: #e3f2fd;
+  color: #0d47a1;
+}
+
+.node-header.service {
+  background-color: #e8f5e9;
+  color: #1b5e20;
+}
+
+.node-header.application {
+  background-color: #f3e5f5;
+  color: #4a148c;
+}
+
+.node-header.task {
+  background-color: #fff3e0;
+  color: #e65100;
+}
+
+.node-header.person {
+  background-color: #e8eaf6;
+  color: #1a237e;
+}
+
+/* 节点类型特定样式 */
+.resource-node {
+  border-color: #90caf9;
+}
+
+.service-node {
+  border-color: #a5d6a7;
+}
+
+.application-node {
+  border-color: #ce93d8;
+}
+
+.task-node {
+  border-color: #ffcc80;
+}
+
+.person-node {
+  border-color: #9fa8da;
+}
