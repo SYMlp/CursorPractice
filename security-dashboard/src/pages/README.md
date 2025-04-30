@@ -2,6 +2,8 @@
 
 本目录包含安全大屏项目的主要页面组件，负责各个功能大屏的整体布局和组件组合。
 
+**请参考 `../data/README.md` 了解详细的数据层架构和数据获取方式。**
+
 ## 文件说明
 
 - `PlatformOverview.tsx`: 平台概览页面
@@ -9,11 +11,13 @@
 - `AssetMonitoring.tsx`: 应用资产监测大屏
 - `DataAssetMonitoring.tsx`: 数据资产监测大屏
 
+**注意**: 本目录不使用 `index.ts` 文件。页面组件通常由路由 (`src/App.tsx`) 直接按需导入。
+
 ## 页面组件设计原则
 
 1. **职责聚焦**: 页面组件负责页面布局和组合，不包含复杂业务逻辑
 2. **组件组合**: 通过组合复用性强的卡片和图表实现复杂页面
-3. **数据分离**: 页面组件从数据层获取数据，但不直接处理数据
+3. **服务层交互**: 页面组件 **应通过调用 `src/data/services` 层的服务函数** 来获取和提交数据，管理相关的加载 (loading) 和错误 (error) 状态。**推荐通过 `services` 的 `index.ts` 统一入口导入所需服务函数** (例如: `import { getPlatformOverviewPageData } from '../data/services';`)。 **禁止直接导入和使用 `src/data/mock` 或 `src/data/api` 层。**
 4. **一致体验**: 所有页面保持一致的设计语言和交互模式
 
 ## 页面详细说明
@@ -38,7 +42,6 @@
 **使用的组件**：
 - `/cards` 目录下的组件:
   - `ResourceCard`: 展示资源总量信息，包括环比增长
-  - `RuleCard`: 展示安全规则信息，包括规则类型及数量
   - `InterfaceCard`: 展示接口管理信息，包括总量和安全率
 - `/charts` 目录下的组件:
   - `CircularProgress`: 展示资源类型百分比分布
@@ -67,10 +70,10 @@
 
 **使用的组件**：
 - `/cards` 目录下的组件:
-  - `MetricCard`: 展示接口监控相关的各项指标数据
-- `/charts` 目录下的组件:
-  - `NetworkTopology`: 展示接口网络拓扑图及节点关系
-  - `MultiLineChart`: 展示各类时间序列数据，支持多条线图比较
+  - `StatisticCard`: 展示接口监控相关的各项指标数据
+- `/charts` 或 `/networks` 目录下的组件:
+  - `NetworkTopology`: 展示接口网络拓扑图及节点关系 (来自 /networks)
+  - `LineChart`: 展示各类时间序列数据 (来自 /charts)
 - `/icons` 目录下的组件:
   - `MonitoringIcons.tsx` 中的监控相关图标:
     - ServerIcon: 服务器图标
@@ -102,23 +105,21 @@
 - 告警类型分布：展示告警类型占比
 
 **使用的组件**：
-- 自定义卡片组件：展示统计指标和TOP排行
-- 根目录下的组件:
+- `/cards` 或 `/charts` 目录下的组件:
+  - `TopRankingCard`: 展示各类 TOP 排行榜 (来自 /charts)
+  - (统计指标卡片使用普通 div 结合图标实现)
+- `/networks` 目录下的组件:
   - `AssetFlowChart`: 展示应用资产流程图，包括应用、用户和告警节点
 - `/charts` 目录下的组件:
   - `LineChart`: 展示业务应用访问量趋势
-  - `PieChart`: 展示告警类型分布
+  - `EnhancedDonutChart`: 展示告警类型分布、安全分布、行业分布
+- `/icons/AssetIcons` 目录下的组件:
+  - `AlertIcon`, `UserIcon`, `ApplicationIcon`, `LoadingIcon` 等用于统计卡片和加载状态
 
 **组件交互关系**:
 - 资产流程图展示应用与用户之间的关系，支持不同风险等级的可视化
 - 各个TOP榜单使用统一的设计风格，展示排名数据
 - 趋势图和分布图提供数据分析视图
-
-**改进历史**:
-- 优化了AssetFlowChart组件，支持三种节点类型和多种风险等级标识
-- 调整布局结构，使界面更紧凑、信息更丰富
-- 统一了卡片样式，优化了统计数据的视觉表现
-- 完善了中央关系图的交互和展示效果
 
 ### DataAssetMonitoring.tsx (数据资产监测大屏)
 
@@ -139,10 +140,14 @@
   - `RiskTag`: 展示风险类型和等级的标签
   - `CapabilityTag`: 展示防护能力类型的标签
   - `CustomTooltip`: 提供长文本的悬浮提示
+- `/networks` 目录下的组件:
+  - `ResourceFlowChart`: 展示资源访问链路图
+  - `ResourceFlowLegend`: 展示资源访问链路图的图例
 - `/charts` 目录下的组件:
-  - `ResourceFlowChart`: 展示资源访问链路图，包含用户、任务、应用、服务、数据等节点
   - `LineChart`: 展示风险趋势变化
-- 自定义卡片组件：展示各类统计数据和TOP榜单
+- `/cards` 目录下的组件:
+  - `StatisticCard`: 展示顶部统计数据
+  - `TableTopCard`: 展示各类 TOP 排行榜 (表格形式，可带进度条)
 
 **组件交互关系**:
 - 中央资源链路图展示各类资源节点的关系，不同风险等级用不同颜色连线表示
@@ -152,38 +157,57 @@
 
 ## 路由管理
 
-项目使用简单的状态管理实现页面切换，在`App.tsx`中通过状态`activePage`控制显示哪个页面：
+项目使用 `react-router-dom` v6 进行路由管理。主要的路由配置在 `src/App.tsx` 文件中定义。
 
-```tsx
-const [activePage, setActivePage] = useState<'resources' | 'monitoring' | 'asset' | 'security'>('resources');
+- **路由定义**: 使用 `<Routes>` 和 `<Route>` 组件定义路径与页面组件的映射关系。
+  ```tsx
+  // 在 App.tsx 中
+  import { Routes, Route } from 'react-router-dom';
+  import PlatformOverview from './pages/PlatformOverview';
+  // ... 其他页面导入
 
-// 根据状态显示不同页面
-{activePage === 'resources' && <PlatformOverview />}
-{activePage === 'monitoring' && <InterfaceMonitoring />}
-{activePage === 'asset' && <AssetMonitoring />}
-{activePage === 'security' && <DataAssetMonitoring />}
-```
+  <Routes>
+    <Route path="/platform" element={<PlatformOverview />} />
+    <Route path="/interface" element={<InterfaceMonitoring />} />
+    <Route path="/asset" element={<AssetMonitoring />} />
+    <Route path="/security" element={<DataAssetMonitoring />} />
+    {/* 其他路由... */}
+    <Route path="/" element={<PlatformOverview />} /> {/* 默认路由 */}
+  </Routes>
+  ```
+
+- **导航**: 侧边栏菜单使用 `<Link>` 组件进行导航。
+  ```tsx
+  // 在 App.tsx 中
+  import { Link, useLocation } from 'react-router-dom';
+
+  const location = useLocation();
+
+  // ... menuItems 定义 ...
+
+  menuItems.map((item: MenuItem) => (
+    <Link
+      to={`/${item.id}`}
+      className={`... ${location.pathname === `/${item.id}` ? 'active-style' : 'inactive-style'}`}
+    >
+      {/* ... icon and label ... */}
+    </Link>
+  ))
+  ```
 
 ## 页面扩展指南
 
 如需添加新的大屏页面，请遵循以下步骤：
 
-1. 在本目录创建新的页面组件文件，如`NewDashboard.tsx`
-2. 按照现有页面的结构，实现新页面的布局和组件组合
-3. 在`App.tsx`中添加状态和导航按钮
-4. 在路由判断中添加新页面的渲染条件
-
-示例：
-```tsx
-// 在App.tsx中
-const [activePage, setActivePage] = useState<'resources' | 'monitoring' | 'asset' | 'security' | 'new'>('resources');
-
-// 添加导航按钮
-<button onClick={() => setActivePage('new')}>新大屏</button>
-
-// 添加路由判断
-{activePage === 'new' && <NewDashboard />}
-```
+1.  在本目录 (`src/pages`) 创建新的页面组件文件，例如 `NewDashboard.tsx`。
+2.  按照现有页面的结构，实现新页面的布局和组件组合，并确保**从 `services` 层 (通过其 `index.ts` 入口) 获取数据**。
+3.  在 `src/App.tsx` 文件中：
+    *   导入你新创建的页面组件：`import NewDashboard from './pages/NewDashboard';`
+    *   在 `<Routes>` 组件内部添加一个新的 `<Route>` 定义：
+      ```tsx
+      <Route path="/new-dashboard" element={<NewDashboard />} />
+      ```
+    *   (可选) 如果需要在侧边栏添加导航链接，更新 `App.tsx` 中的 `menuItems` 数组，添加新的菜单项定义。
 
 ## 更新记录
 
@@ -203,16 +227,17 @@ const [activePage, setActivePage] = useState<'resources' | 'monitoring' | 'asset
 
 ### 基本架构模式
 1. **职责分离**: 
-   - `pages`目录: 定义页面布局和结构，负责组织各组件的排列方式
-   - `components`目录: 定义可复用的UI组件，负责实现具体功能
-   - `data`目录: 定义mock数据，供组件渲染展示
+   - `pages`目录: 定义页面布局和结构，负责组织各组件的排列方式，**调用 Service 获取数据 (通过 `src/data/services` 的 `index.ts` 入口)**。
+   - `components`目录: 定义可复用的UI组件，负责实现具体功能，接收来自 Page 的 Props。
+   - `src/data`目录: 负责数据获取和处理 (详见 `../data/README.md`)。
    - 样式: 使用Tailwind CSS在组件内部定义
 
 2. **数据流向**:
-   - 数据从`data`层流向`pages`层，再分发到各个`components`
-   - `pages`组件接收数据并传递给子组件
-   - `components`组件接收props数据并渲染，保持数据与UI的分离
-   - 组件内部可维护自己的状态(state)，但不应直接修改全局数据
+   - 数据获取由 `pages` 组件发起，**调用 `src/data/services` 层的函数**。
+   - `services` 层负责与 `api` 层 (或 `mock` 层) 交互，并可能进行数据处理。
+   - `services` 层将最终数据返回给 `pages` 组件。
+   - `pages` 组件将所需数据通过 Props 传递给子 `components` 组件进行渲染。
+   - `components` 组件接收 props 数据并渲染，保持数据与UI的分离。
 
 3. **组件层次结构**:
    - 页面级组件: 在`pages`目录中，负责整体布局和状态管理
@@ -223,13 +248,14 @@ const [activePage, setActivePage] = useState<'resources' | 'monitoring' | 'asset
 1. **规划阶段**:
    - 确定页面的整体布局和主要功能区域
    - 识别可以复用的组件
-   - 确定需要的数据结构
+   - **确定所需数据，并检查 `src/data/services` (通过其 `index.ts` 导出) 是否已有对应的服务函数，若无则需先在数据层实现**。
 
 2. **实现阶段**:
    - 创建页面的基本结构和布局
    - 集成所需的组件
-   - 从数据层获取数据并传递给组件
-   - 实现组件间的交互逻辑
+   - **从 `src/data/services` (通过其 `index.ts` 入口) 导入并调用服务函数获取数据**。
+   - 将获取的数据通过 Props 传递给子组件。
+   - 实现组件间的交互逻辑 (如时间范围切换触发重新获取数据)。
 
 3. **优化阶段**:
    - 优化组件的重用

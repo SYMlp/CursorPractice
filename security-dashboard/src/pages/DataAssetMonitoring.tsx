@@ -1,23 +1,14 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { ResourceFlowChart, ResourceFlowLegend } from '../components/networks';
 import LineChart from '../components/charts/LineChart';
 import { RiskTag, CapabilityTag, CustomTooltip } from '../components/tags/index';
 import { StatisticCard, RankingCard, TableTopCard } from '../components/cards';
-import { 
-  assetStats, 
-  riskResourceData, 
-  highRiskUserData, 
-  storageRiskResourceData, 
-  lackProtectionResourceData,
-  riskTrendData
-} from '../data/securityMonitoringData';
 import {
-  storageRiskResourceTableData,
-  protectionLackResourceTableData,
-  highRiskUserTableData
-} from '../data/tableTopData';
-// 导入资源流图的模拟数据
-import resourceFlowData from '../data/mock/network/resourceFlowData';
+  getDataAssetMonitoringPageData,
+  DataAssetMonitoringPageData
+} from '../data/services/dataAssetService';
+import { Node, Edge } from 'reactflow';
+import { NodeData, EdgeData } from '../components/networks/ResourceFlowChart';
 
 /**
  * 数据资产监测页面
@@ -46,6 +37,28 @@ import resourceFlowData from '../data/mock/network/resourceFlowData';
  * - 2024-06-16: 优化数据资产防护监测大屏，添加ResourceFlowChart组件，创建标签组件目录和相关组件
  */
 const DataAssetMonitoring: React.FC = () => {
+  const [pageData, setPageData] = useState<DataAssetMonitoringPageData | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        const data = await getDataAssetMonitoringPageData(); 
+        setPageData(data);
+      } catch (err: any) {
+        console.error("Error fetching data asset monitoring page data:", err);
+        setError(err.message || '获取页面数据失败');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
+
   // 处理节点点击，仅用于日志记录或其他操作，不再管理选中状态
   const handleNodeClick = (node: any) => {
     console.log('Node clicked in parent component:', node);
@@ -61,8 +74,60 @@ const DataAssetMonitoring: React.FC = () => {
     console.log('Ranking item clicked:', item);
   };
 
-  // 获取包含异常连接的数据集，用于展示更丰富的资源访问关系
-  const { nodes, edges } = resourceFlowData.withAbnormal;
+  if (loading) {
+    return <div className="p-4 text-center">正在加载数据...</div>;
+  }
+
+  if (error) {
+    return <div className="p-4 text-center text-red-500">加载数据出错: {error}</div>;
+  }
+
+  if (!pageData) {
+    return <div className="p-4 text-center">没有可显示的数据。</div>;
+  }
+
+  const { stats, resourceFlow, topRankings, riskTrend } = pageData;
+  
+  // -- 数据转换 --
+  // 转换 Nodes
+  const chartNodes: Node<NodeData>[] = resourceFlow.nodes.map((node, index) => ({
+    id: node.id, // API 提供的 ID
+    position: { x: Math.random() * 400, y: Math.random() * 400 }, // 简单的随机位置，后续可改进
+    data: { label: node.name }, // 将 name 映射到 data.label
+    // type: 'resource' // 可以根据 API 返回的节点类型设置，如果 API 不提供则用默认
+  }));
+
+  // 转换 Edges
+  const chartEdges: Edge<EdgeData>[] = resourceFlow.edges.map((edge, index) => ({
+    id: `e${edge.source}-${edge.target}-${index}`, // 生成一个唯一的边 ID
+    source: edge.source,
+    target: edge.target,
+    type: 'smoothstep', // 默认边类型
+    // data: { ... } // 如果 API 返回了边的属性，可以在这里映射到 EdgeData
+  }));
+  // -- 结束数据转换 --
+
+  // -- 数据转换 for TableTopCard --
+  // Function to safely convert RankingItem ID to number
+  const transformRankingItem = (item: any): any /* Adjust type if RankingCard's type is known */ => {
+    const numericId = typeof item.id === 'string' ? parseInt(item.id, 10) : item.id;
+    // Handle potential NaN from parseInt if needed, e.g., assign a default or skip
+    if (isNaN(numericId)) {
+      console.warn(`Ranking item ID '${item.id}' could not be parsed to a number. Skipping or using default ID.`);
+      // Option 1: Skip the item (return null and filter later)
+      // return null;
+      // Option 2: Assign a default/fallback ID (e.g., -1 or index, might cause issues)
+      // return { ...item, id: -1 };
+    }
+    return { ...item, id: numericId }; 
+  };
+
+  // Apply transformation to each ranking list
+  const riskyResources = (topRankings['byRisk'] || []).map(transformRankingItem); //.filter(item => item !== null);
+  const riskyUsers = (topRankings['bySensitiveDataUser'] || []).map(transformRankingItem); //.filter(item => item !== null);
+  const storageRiskResources = (topRankings['byStorageRisk'] || []).map(transformRankingItem); //.filter(item => item !== null);
+  const protectionLackResources = (topRankings['byProtectionLack'] || []).map(transformRankingItem); //.filter(item => item !== null);
+  // -- 结束数据转换 --
 
   return (
     <div className="p-4 bg-gray-100 min-h-screen">
@@ -80,7 +145,7 @@ const DataAssetMonitoring: React.FC = () => {
           {/* 左侧 - 访问关系图及数据统计 */}
           <div className="col-span-8 flex flex-col h-full overflow-hidden">
             <div className="grid grid-cols-3 gap-4 mb-4 flex-none">
-              {assetStats.map((stat, index) => (
+              {stats.map((stat, index) => (
                 <StatisticCard
                   key={index}
                   label={stat.label}
@@ -107,8 +172,8 @@ const DataAssetMonitoring: React.FC = () => {
                 {/* 资源流程图 */}
                 <div className="flex-1 min-h-0 border border-gray-100 rounded-md">
                   <ResourceFlowChart 
-                    initialNodes={nodes}
-                    initialEdges={edges}
+                    initialNodes={chartNodes}
+                    initialEdges={chartEdges}
                     onNodeClick={handleNodeClick}
                     onEdgeClick={handleEdgeClick}
                     showControls={true}
@@ -130,7 +195,7 @@ const DataAssetMonitoring: React.FC = () => {
             <div className="flex-none" style={{ height: '45%' }}>
               <TableTopCard
                 title="风险最多数据资源TOP"
-                data={storageRiskResourceTableData}
+                data={riskyResources}
                 columns={[
                   { key: 'name', title: '资源名称' },
                   { key: 'riskValue', title: '风险', align: 'right' }
@@ -146,7 +211,7 @@ const DataAssetMonitoring: React.FC = () => {
             <div className="flex-none mt-4" style={{ height: '52%' }}>
               <TableTopCard
                 title="高敏数据使用风险最多人TOP"
-                data={highRiskUserTableData}
+                data={riskyUsers}
                 columns={[
                   { key: 'name', title: '姓名' },
                   { key: 'threatValue', title: '威胁数', align: 'right' }
@@ -167,7 +232,7 @@ const DataAssetMonitoring: React.FC = () => {
             {/* 存在存储风险的数据资源TOP */}
             <TableTopCard
               title="存在存储风险的数据资源TOP"
-              data={storageRiskResourceTableData}
+              data={storageRiskResources}
               columns={[
                 { key: 'name', title: '资源名称' },
                 { 
@@ -191,7 +256,7 @@ const DataAssetMonitoring: React.FC = () => {
             {/* 存在防护能力缺失的数据资源TOP */}
             <TableTopCard
               title="存在防护能力缺失的数据资源TOP"
-              data={protectionLackResourceTableData}
+              data={protectionLackResources}
               columns={[
                 { key: 'name', title: '资源名称' },
                 { 
@@ -220,8 +285,8 @@ const DataAssetMonitoring: React.FC = () => {
             <div className="flex-grow pb-6">
               <LineChart
                 title=""
-                xAxisData={riskTrendData.xAxis}
-                series={riskTrendData.series}
+                xAxisData={riskTrend.xAxisData}
+                series={riskTrend.series}
                 showLegend={true}
                 legendPosition="top"
                 height="100%"

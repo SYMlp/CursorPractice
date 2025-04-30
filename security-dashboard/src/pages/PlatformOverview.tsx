@@ -1,109 +1,47 @@
-import React, { useState, useEffect } from 'react';
-import CircularProgress from '../components/charts/CircularProgress';
-import LineChart from '../components/charts/LineChart';
+import React, { useState, useEffect, useCallback } from 'react';
+import { AreaChart, DonutChart, Card, Title, Text, Grid, Col, Select, SelectItem, Icon } from '@tremor/react';
+import { LoadingIcon, ImageIcon, ShieldIcon, InterfaceIcon } from '../components/icons';
+// import { GrowthIndicator } from '../components/Indicators'; // Module not found, commented out
+// import { TimeSeriesCard } from '../components/TimeSeriesCard'; // Module not found, commented out
 import ResourceCard from '../components/cards/ResourceCard';
 import RuleCard from '../components/cards/RuleCard';
 import InterfaceCard from '../components/cards/InterfaceCard';
-import { 
-  ShieldIcon, 
-  InterfaceIcon,
-  ImageIcon,
-  LoadingIcon
-} from '../components/icons';
-import { 
-  resourceManagementData, 
-  resourceTypesData, 
-  securityRulesData, 
-  interfaceManagementData,
-} from '../data/mockData';
-
-// 使用图标映射工具
-import { getIcon } from '../utils/iconMapping';
-
-// 直接导入图片图标
-import resourceIcon from '../assets/icons/platform/resource.png';
+// import { ResourceTypeChart } from '../components/charts/ResourceTypeChart'; // Module not found, commented out
+import { LineChart, BarChart, CircularProgress } from '../components/charts';
+import { getInterfaceTimeSeriesApi } from '../data/api/interface';
 import identityIcon from '../assets/icons/platform/identity.png';
 import standardIcon from '../assets/icons/platform/standard.png';
-
+import resourceIcon from '../assets/icons/platform/resource.png';
 // 规则图标
 import identifyRuleIcon from '../assets/icons/rules/identify.png';
 import protectionRuleIcon from '../assets/icons/rules/protection.png';
 import detectRuleIcon from '../assets/icons/rules/detect.png';
 import responseRuleIcon from '../assets/icons/rules/response.png';
-
-// 添加时间范围类型定义
-type TimeRange = 'day' | 'week' | 'month';
+// 导入 Service 函数和类型
+import {
+  getPlatformOverviewPageData,
+  PlatformOverviewPageData,
+  TimeRange,
+} from '../data/services/platformService';
 
 // 添加图表ID类型定义
 type ChartId = 'south' | 'identify' | 'protection' | 'detection' | 'response';
 
-// 添加mock数据生成函数
-const generateMockData = (range: TimeRange) => {
-  const baseData = {
-    day: ['00:00', '04:00', '08:00', '12:00', '16:00', '20:00', '24:00'],
-    week: ['周一', '周二', '周三', '周四', '周五', '周六', '周日'],
-    month: ['1日', '5日', '10日', '15日', '20日', '25日', '30日']
-  };
+// 为 resourceTypesData 定义类型 (基于 mock/platform/resourceTypes.ts)
+interface ResourceTypeItem {
+  title: string;
+  percentage: number;
+  color: string;
+}
 
-  const generateRandomData = (base: number, range: number) => {
-    return Array(7).fill(0).map(() => 
-      Math.floor(base + Math.random() * range)
-    );
-  };
-
-  return {
-    xAxisData: baseData[range],
-    series: {
-      interfaceData: [
-        {
-          name: '授权接口数量',
-          data: generateRandomData(2000, 6000),
-          color: '#3b82f6'
-        },
-        {
-          name: '敏感资源接口',
-          data: generateRandomData(4000, 4000),
-          color: '#10b981'
-        },
-        {
-          name: '未知安全接口',
-          data: generateRandomData(1000, 3000),
-          color: '#f59e0b'
-        }
-      ],
-      identificationData: [
-        {
-          name: '识别服务',
-          data: generateRandomData(2000, 5000),
-          color: '#f59e0b',
-          areaStyle: true
-        }
-      ],
-      protectionData: [
-        {
-          name: '防护服务',
-          data: generateRandomData(2000, 6000),
-          color: '#3b82f6'
-        }
-      ],
-      detectionData: [
-        {
-          name: '检测服务',
-          data: generateRandomData(1000, 5000),
-          color: '#f97316',
-          areaStyle: true
-        }
-      ],
-      responseData: [
-        {
-          name: '响应服务',
-          data: generateRandomData(2000, 6000),
-          color: '#10b981'
-        }
-      ]
-    }
-  };
-};
+// 为 securityRulesData 定义类型 (基于 mock/platform/securityRules.ts)
+interface SecurityRuleItem {
+  title: string;
+  count: number;
+  baseCount: number;
+  todayCount: number;
+  color: string;
+}
 
 /**
  * 平台概览页面
@@ -127,13 +65,15 @@ const generateMockData = (range: TimeRange) => {
  * - 2023-11-28: 将ResourceMonitoring重命名为PlatformOverview
  */
 const PlatformOverview: React.FC = () => {
-  // 状态管理
-  const [timeRanges, setTimeRanges] = useState<Record<ChartId, TimeRange>>({
-    south: 'week',
-    identify: 'week',
-    protection: 'week',
-    detection: 'week',
-    response: 'week'
+  // 添加状态管理
+  const [pageData, setPageData] = useState<PlatformOverviewPageData | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
+  // 时间范围状态管理保持不变，因为聚合函数会根据这个来获取数据
+  const [timeRanges, setTimeRanges] = useState<Record<string, TimeRange>>({
+    serviceCalls: 'day',
+    failedCalls: 'day',
+    responseTime: 'day'
   });
   const [isLoading, setIsLoading] = useState<Record<ChartId, boolean>>({
     south: false,
@@ -143,37 +83,48 @@ const PlatformOverview: React.FC = () => {
     response: false
   });
   const [activeChart, setActiveChart] = useState<ChartId | null>(null);
-  const [chartData, setChartData] = useState<Record<ChartId, any>>({
-    south: generateMockData('week'),
-    identify: generateMockData('week'),
-    protection: generateMockData('week'),
-    detection: generateMockData('week'),
-    response: generateMockData('week')
-  });
   
-  // 模拟数据加载
+  // 使用 useEffect 获取数据
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setIsLoading(prev => ({ ...prev, south: false, identify: false, protection: false, detection: false, response: false }));
-    }, 1000);
-    return () => clearTimeout(timer);
-  }, []);
+    const fetchData = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        // 传递给聚合函数的 timeRangeMap 的 key 需要与 Service 中处理的一致
+        // service 定义的 key 是 timeSeriesData，内部处理了不同的 serviceId
+        // 页面中使用 serviceCalls, failedCalls 等作为 map key
+        // 这里假设 service 的 getPlatformOverviewPageData 期望的 map key 与页面状态一致
+        const data = await getPlatformOverviewPageData(timeRanges); 
+        setPageData(data);
+      } catch (err: any) {
+        console.error("Error fetching platform overview data:", err);
+        setError(err.message || '获取平台概览数据失败');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  // 当 timeRanges 变化时重新获取数据
+  }, [timeRanges]); 
 
   // 创建带有图标的指标数据
-  const metricsWithIcons = [
-    {
-      ...resourceManagementData.metrics[0],
-      icon: <ImageIcon src={identityIcon} width={20} height={20} />
-    },
-    {
-      ...resourceManagementData.metrics[1],
-      icon: <ImageIcon src={standardIcon} width={20} height={20} />
-    },
-    {
-      ...resourceManagementData.metrics[2],
-      icon: <ShieldIcon size={20} />
-    }
-  ];
+  // const metricsWithIcons = [ ... ]; // 如果这个也依赖旧数据，需要适配或移除
+  const adaptedGrowthItems = pageData?.resourceOverview.growthItems.map(item => ({
+    label: item.label,
+    value: item.value,
+    isUp: item.isUp
+  }));
+  
+  // 处理 metrics 的 undefined 和 icon 问题 (假设 ResourceCard 需要 icon)
+  const adaptedMetrics = (pageData?.resourceOverview.metrics || []).map((metric, index) => ({
+    ...metric,
+    // 尝试从某个地方获取图标，如果 resourceOverview.metrics 不包含 icon
+    // 这里用一个占位符，实际需要根据逻辑填充
+    icon: index === 0 ? <ImageIcon src={identityIcon} width={20} height={20} /> : 
+          index === 1 ? <ImageIcon src={standardIcon} width={20} height={20} /> : 
+          <ShieldIcon size={20} /> 
+  }));
 
   // 规则图标映射
   const ruleIcons = [
@@ -188,19 +139,9 @@ const PlatformOverview: React.FC = () => {
   const resourceTypeLabels = ['核心资产', '对外资产', '内部资产', '云上资产', 'API'];
   
   // 处理时间范围切换
-  const handleTimeRangeChange = (chartId: ChartId, range: TimeRange) => {
-    setTimeRanges(prev => ({ ...prev, [chartId]: range }));
-    setIsLoading(prev => ({ ...prev, [chartId]: true }));
-    
-    // 模拟数据加载
-    setTimeout(() => {
-      setChartData(prev => ({
-        ...prev,
-        [chartId]: generateMockData(range)
-      }));
-      setIsLoading(prev => ({ ...prev, [chartId]: false }));
-    }, 500);
-  };
+  const handleTimeRangeChange = useCallback((chartId: string, value: TimeRange) => {
+    setTimeRanges(prev => ({ ...prev, [chartId]: value }));
+  }, []);
 
   // 处理图表点击
   const handleChartClick = (chartId: ChartId) => {
@@ -208,48 +149,28 @@ const PlatformOverview: React.FC = () => {
   };
 
   // 时间范围切换按钮组
-  const TimeRangeSelector = ({ 
-    chartId, 
-    currentRange, 
-    onChange 
-  }: { 
-    chartId: ChartId;
+  const TimeRangeSelector: React.FC<{ 
+    chartId: string; 
     currentRange: TimeRange; 
-    onChange: (range: TimeRange) => void;
-  }) => (
-    <div className="flex bg-gray-50 rounded-lg p-0.5 text-xs">
-      <button 
-        className={`px-2 py-1 rounded-md transition-colors ${
-          currentRange === 'day' 
-            ? 'bg-white text-blue-600 shadow-sm' 
-            : 'text-gray-600 hover:text-blue-600'
-        }`}
-        onClick={() => onChange('day')}
+    onChange: (range: TimeRange) => void; 
+  }> = ({ chartId, currentRange, onChange }) => {
+    const timeOptions = [
+      { value: 'day', label: '今日' },
+      { value: 'week', label: '本周' },
+      { value: 'month', label: '本月' },
+    ];
+    return (
+      <select 
+        value={currentRange}
+        onChange={(e) => onChange(e.target.value as TimeRange)}
+        className="text-xs p-1 border rounded bg-gray-50"
       >
-        一天
-      </button>
-      <button 
-        className={`px-2 py-1 rounded-md transition-colors ${
-          currentRange === 'week' 
-            ? 'bg-white text-blue-600 shadow-sm' 
-            : 'text-gray-600 hover:text-blue-600'
-        }`}
-        onClick={() => onChange('week')}
-      >
-        一周
-      </button>
-      <button 
-        className={`px-2 py-1 rounded-md transition-colors ${
-          currentRange === 'month' 
-            ? 'bg-white text-blue-600 shadow-sm' 
-            : 'text-gray-600 hover:text-blue-600'
-        }`}
-        onClick={() => onChange('month')}
-      >
-        一月
-      </button>
-    </div>
-  );
+        {timeOptions.map(opt => (
+          <option key={opt.value} value={opt.value}>{opt.label}</option>
+        ))}
+      </select>
+    );
+  };
 
   // 加载状态组件
   const LoadingState = () => (
@@ -257,6 +178,28 @@ const PlatformOverview: React.FC = () => {
       <LoadingIcon size={24} className="animate-spin text-blue-500" />
     </div>
   );
+
+  // 添加加载和错误状态处理
+  if (loading) {
+    return <div className="p-4 text-center">正在加载平台概览数据...</div>;
+  }
+
+  if (error) {
+    return <div className="p-4 text-center text-red-500">加载数据出错: {error}</div>;
+  }
+
+  if (!pageData) {
+    return <div className="p-4 text-center">没有可显示的平台概览数据。</div>;
+  }
+
+  // 从 pageData 解构数据，简化 JSX 访问
+  const { 
+    resourceOverview,
+    resourceTypes,
+    securityRules,
+    interfaceOverview,
+    timeSeriesData
+  } = pageData;
 
   return (
     <div className="p-4 bg-gray-100 min-h-screen">
@@ -275,9 +218,9 @@ const PlatformOverview: React.FC = () => {
             <ResourceCard 
               icon={<ImageIcon src={resourceIcon} width={32} height={32} />}
               title="资源管理"
-              count={resourceManagementData.count}
-              metrics={metricsWithIcons}
-              growthItems={resourceManagementData.growthItems}
+              count={resourceOverview.count}
+              metrics={adaptedMetrics}
+              growthItems={adaptedGrowthItems}
             />
           </div>
         
@@ -285,16 +228,12 @@ const PlatformOverview: React.FC = () => {
           <div className="col-span-2 bg-white rounded-lg shadow-lg p-4 hover:shadow-xl transition-shadow">
             <h3 className="text-base font-medium text-gray-700 mb-4">资源类型分布</h3>
             <div className="grid grid-cols-5 gap-4">
-              {resourceTypesData.map((item, index) => (
+              {resourceTypes.map((item: ResourceTypeItem, index: number) => (
                 <CircularProgress 
                   key={index}
                   percentage={item.percentage}
-                  title={resourceTypeLabels[index] || item.title}
-                  color={index === 0 ? '#3b82f6' : 
-                         index === 1 ? '#f59e0b' : 
-                         index === 2 ? '#10b981' : 
-                         index === 3 ? '#8b5cf6' : 
-                         '#f97316'}
+                  title={item.title}
+                  color={item.color}
                   layout="vertical"
                   size="medium"
                   description="占比"
@@ -314,20 +253,12 @@ const PlatformOverview: React.FC = () => {
               </button>
             </div>
             <div className="grid grid-cols-5 gap-4">
-              {securityRulesData.map((rule, index) => (
-                <div key={index} className="hover:scale-105 transition-transform">
-                  <RuleCard 
-                    icon={<ImageIcon src={ruleIcons[index]} width={28} height={28} />}
-                    title={rule.title}
-                    count={rule.count}
-                    baseCount={rule.baseCount}
-                    todayCount={rule.todayCount}
-                    color={index === 0 ? '#3b82f6' : 
-                           index === 1 ? '#ef4444' : 
-                           index === 2 ? '#8b5cf6' : 
-                           index === 3 ? '#f59e0b' : 
-                           '#10b981'}
-                  />
+              {securityRules.map((rule: SecurityRuleItem, index: number) => (
+                <div key={index} className="hover:scale-105 transition-transform p-3 border rounded bg-gray-50 text-center">
+                  <img src={ruleIcons[index]} alt={rule.title} className="w-7 h-7 mx-auto mb-1" />
+                  <p className="text-sm font-medium truncate">{rule.title}</p>
+                  <p className="text-lg font-bold" style={{ color: rule.color }}>{rule.count}</p>
+                  <p className="text-xs text-gray-500">今日新增: {rule.todayCount}</p>
                 </div>
               ))}
             </div>
@@ -343,12 +274,12 @@ const PlatformOverview: React.FC = () => {
               <InterfaceCard 
                 icon={<InterfaceIcon size={32} />}
                 title="接口数总量"
-                count={interfaceManagementData.count}
-                securityRate={interfaceManagementData.securityRate}
-                publishRate={interfaceManagementData.publishRate}
-                callbackRate={interfaceManagementData.callbackRate}
-                metrics={interfaceManagementData.metrics}
-                publishedInterfaces={interfaceManagementData.publishedInterfaces}
+                count={interfaceOverview.count}
+                securityRate={interfaceOverview.securityRate}
+                publishRate={interfaceOverview.publishRate}
+                callbackRate={interfaceOverview.callbackRate}
+                metrics={interfaceOverview.metrics}
+                publishedInterfaces={interfaceOverview.publishedInterfaces}
               />
             </div>
           </div>
@@ -363,20 +294,22 @@ const PlatformOverview: React.FC = () => {
             <div className="flex justify-between items-center mb-4">
               <h3 className="text-base font-medium text-gray-700">南向接口数据量</h3>
               <TimeRangeSelector 
-                chartId="south"
-                currentRange={timeRanges.south} 
-                onChange={(range) => handleTimeRangeChange('south', range)} 
+                chartId="serviceCalls"
+                currentRange={timeRanges.serviceCalls} 
+                onChange={(range) => handleTimeRangeChange('serviceCalls', range)} 
               />
             </div>
             <div className="flex-1 flex items-center">
               {isLoading.south ? <LoadingState /> : (
-                <LineChart 
-                  title=""
-                  xAxisData={chartData.south.xAxisData}
-                  series={chartData.south.series.interfaceData}
-                  showLegend={true}
-                  height="100%"
-                />
+                timeSeriesData.serviceCalls?.xAxisData && timeSeriesData.serviceCalls?.series ? (
+                  <LineChart 
+                    title=""
+                    xAxisData={timeSeriesData.serviceCalls.xAxisData}
+                    series={timeSeriesData.serviceCalls.series}
+                    showLegend={true}
+                    height="100%"
+                  />
+                ) : <div className="text-center text-gray-500 text-sm">无南向接口数据</div>
               )}
             </div>
           </div>
@@ -391,20 +324,22 @@ const PlatformOverview: React.FC = () => {
             <div className="flex justify-between items-center mb-4">
               <h3 className="text-base font-medium text-gray-700">识别服务接口数据量</h3>
               <TimeRangeSelector 
-                chartId="identify"
-                currentRange={timeRanges.identify} 
-                onChange={(range) => handleTimeRangeChange('identify', range)} 
+                chartId="failedCalls"
+                currentRange={timeRanges.failedCalls} 
+                onChange={(range) => handleTimeRangeChange('failedCalls', range)} 
               />
             </div>
             <div className="flex-1 flex items-center">
               {isLoading.identify ? <LoadingState /> : (
-                <LineChart 
-                  title=""
-                  xAxisData={chartData.identify.xAxisData}
-                  series={chartData.identify.series.identificationData}
-                  showLegend={false}
-                  height="100%"
-                />
+                timeSeriesData.failedCalls?.xAxisData && timeSeriesData.failedCalls?.series ? (
+                  <BarChart 
+                    data={{
+                      categories: timeSeriesData.failedCalls.xAxisData,
+                      series: timeSeriesData.failedCalls.series
+                    }}
+                    showLegend={false}
+                  />
+                ) : <div className="text-center text-gray-500 text-sm">无识别服务数据</div>
               )}
             </div>
           </div>
@@ -422,18 +357,18 @@ const PlatformOverview: React.FC = () => {
             <div className="flex justify-between items-center mb-4">
               <h3 className="text-base font-medium text-gray-700">防护服务数据量</h3>
               <TimeRangeSelector 
-                chartId="protection"
-                currentRange={timeRanges.protection} 
-                onChange={(range) => handleTimeRangeChange('protection', range)} 
+                chartId="responseTime"
+                currentRange={timeRanges.responseTime} 
+                onChange={(range) => handleTimeRangeChange('responseTime', range)} 
               />
             </div>
             <div className="flex-1 flex items-center">
               {isLoading.protection ? <LoadingState /> : (
                 <LineChart 
                   title=""
-                  xAxisData={chartData.protection.xAxisData}
-                  series={chartData.protection.series.protectionData}
-                  showLegend={false}
+                  xAxisData={timeSeriesData.responseTime.xAxisData}
+                  series={timeSeriesData.responseTime.series}
+                  showLegend={true}
                   height="100%"
                 />
               )}
@@ -450,20 +385,21 @@ const PlatformOverview: React.FC = () => {
             <div className="flex justify-between items-center mb-4">
               <h3 className="text-base font-medium text-gray-700">检测服务接口数据量</h3>
               <TimeRangeSelector 
-                chartId="detection"
-                currentRange={timeRanges.detection} 
-                onChange={(range) => handleTimeRangeChange('detection', range)} 
+                chartId="serviceCalls"
+                currentRange={timeRanges.serviceCalls} 
+                onChange={(range) => handleTimeRangeChange('serviceCalls', range)} 
               />
             </div>
             <div className="flex-1 flex items-center">
               {isLoading.detection ? <LoadingState /> : (
-                <LineChart 
-                  title=""
-                  xAxisData={chartData.detection.xAxisData}
-                  series={chartData.detection.series.detectionData}
-                  showLegend={false}
-                  height="100%"
-                />
+                timeSeriesData.serviceCalls ? (
+                  <LineChart 
+                    title=""
+                    xAxisData={timeSeriesData.serviceCalls.xAxisData}
+                    series={timeSeriesData.serviceCalls.series}
+                    height={100}
+                  />
+                 ) : <div className="text-center text-gray-500 text-sm">无检测服务数据</div>
               )}
             </div>
           </div>
@@ -478,20 +414,22 @@ const PlatformOverview: React.FC = () => {
             <div className="flex justify-between items-center mb-4">
               <h3 className="text-base font-medium text-gray-700">响应服务接口数据量</h3>
               <TimeRangeSelector 
-                chartId="response"
-                currentRange={timeRanges.response} 
-                onChange={(range) => handleTimeRangeChange('response', range)} 
+                chartId="failedCalls"
+                currentRange={timeRanges.failedCalls} 
+                onChange={(range) => handleTimeRangeChange('failedCalls', range)} 
               />
             </div>
             <div className="flex-1 flex items-center">
               {isLoading.response ? <LoadingState /> : (
-                <LineChart 
-                  title=""
-                  xAxisData={chartData.response.xAxisData}
-                  series={chartData.response.series.responseData}
-                  showLegend={false}
-                  height="100%"
-                />
+                timeSeriesData.failedCalls?.xAxisData && timeSeriesData.failedCalls?.series ? (
+                  <BarChart 
+                    data={{
+                      categories: timeSeriesData.failedCalls.xAxisData,
+                      series: timeSeriesData.failedCalls.series
+                    }}
+                    showLegend={false}
+                  />
+                ) : <div className="text-center text-gray-500 text-sm">无响应服务数据</div>
               )}
             </div>
           </div>
@@ -501,4 +439,4 @@ const PlatformOverview: React.FC = () => {
   );
 };
 
-export default PlatformOverview; 
+export default PlatformOverview;

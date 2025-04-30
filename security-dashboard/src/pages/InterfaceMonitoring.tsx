@@ -1,49 +1,73 @@
-import React from 'react';
-import MetricCard from '../components/cards/MetricCard';
-import NetworkTopology from '../components/networks/NetworkTopology';
-import MultiLineChart from '../components/charts/MultiLineChart';
+import React, { useState, useEffect } from 'react';
+import { StatisticCard } from '../components/cards';
+import { NetworkTopology } from '../components/networks';
+import LineChart from '../components/charts/LineChart';
 import { 
-  ServerIcon, 
-  ApiIcon, 
-  ConnectionIcon, 
-  RequestIcon, 
-  ResponseIcon, 
-  MonitorIcon 
-} from '../components/icons/MonitoringIcons';
-import { 
-  metricCardsData, 
-  timeData, 
-  tpsData, 
-  connectionData, 
-  applicationData, 
-  securityCheckpointData 
-} from '../data/monitoringData';
+  getInterfaceMonitoringPageData,
+  InterfaceMonitoringPageData,
+  TimeRange
+} from '../data/services/interfaceService';
 
-// 时间范围类型
-type TimeRange = 'day' | 'week';
+interface MetricItem {
+  title: string; 
+  value: string; 
+  color?: string; 
+  icon?: string; 
+}
+
+// 定义 LineChart series 兼容的类型 (或者使用 any)
+interface CompatibleDataSeries {
+  name: string;
+  data: number[];
+  color?: string;
+  areaStyle?: boolean; // 确保 areaStyle 是 boolean 或 undefined
+}
 
 const InterfaceMonitoring: React.FC = () => {
-  // 获取对应的图标组件
-  const getIconComponent = (iconName: string) => {
-    switch (iconName) {
-      case 'server':
-        return <ServerIcon size={28} />;
-      case 'api':
-        return <ApiIcon size={28} />;
-      case 'connection':
-        return <ConnectionIcon size={28} />;
-      case 'request':
-        return <RequestIcon size={28} />;
-      case 'response':
-        return <ResponseIcon size={28} />;
-      case 'monitor':
-        return <MonitorIcon size={28} />;
-      default:
-        return <ServerIcon size={28} />;
-    }
+  const [pageData, setPageData] = useState<InterfaceMonitoringPageData | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
+  const [timeRanges, setTimeRanges] = useState<Record<string, TimeRange>>({
+    callVolume: 'day',
+    errorRate: 'day' 
+  });
+
+  useEffect(() => {
+    const fetchData = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        const data = await getInterfaceMonitoringPageData(timeRanges);
+        setPageData(data);
+      } catch (err: any) {
+        console.error("Error fetching interface monitoring data:", err);
+        setError(err.message || '获取接口监控数据失败');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [timeRanges]);
+
+  const handleTimeRangeChange = (chartId: string, value: TimeRange) => {
+    setTimeRanges(prev => ({ ...prev, [chartId]: value }));
   };
 
-  // 时间范围选择器组件
+  if (loading) {
+    return <div className="p-4 text-center">正在加载接口监控数据...</div>;
+  }
+
+  if (error) {
+    return <div className="p-4 text-center text-red-500">加载数据出错: {error}</div>;
+  }
+
+  if (!pageData) {
+    return <div className="p-4 text-center">没有可显示的接口监控数据。</div>;
+  }
+
+  const { metrics, topology, timeSeriesData } = pageData;
+
   const TimeRangeSelector: React.FC<{ value: TimeRange; onChange: (range: TimeRange) => void }> = ({ value, onChange }) => {
     return (
       <div className="flex space-x-2">
@@ -71,84 +95,72 @@ const InterfaceMonitoring: React.FC = () => {
     );
   };
 
+  // -- 数据转换 for LineChart --
+  const transformChartSeries = (series: any[] | undefined): CompatibleDataSeries[] => {
+    if (!series) return [];
+    return series.map(s => ({
+      ...s,
+      // 将 areaStyle 转换为 boolean | undefined
+      areaStyle: typeof s.areaStyle === 'object' ? true : (typeof s.areaStyle === 'boolean' ? s.areaStyle : undefined)
+    }));
+  };
+
+  const callVolumeSeries = transformChartSeries(timeSeriesData.callVolume?.series);
+  const errorRateSeries = transformChartSeries(timeSeriesData.errorRate?.series);
+  // -- 结束数据转换 --
+
   return (
-    <div className="bg-gray-100 min-h-screen p-4">
-      <div className="max-w-7xl mx-auto space-y-4">
-        {/* 指标卡片区域 */}
-        <div className="grid grid-cols-6 gap-4">
-          {metricCardsData.map((card, index) => (
-            <MetricCard
-              key={index}
-              title={card.title}
-              value={card.value}
-              color={card.color}
-              icon={getIconComponent(card.icon)}
+    <div className="p-4 bg-gray-100 min-h-screen">
+      <div className="max-w-7xl mx-auto">
+        <h1 className="text-2xl font-bold text-gray-800 mb-4">接口运行监控</h1>
+
+        <div className="grid grid-cols-1 md:grid-cols-6 gap-4 mb-4">
+          {(metrics as MetricItem[]).map((metric, index) => (
+            <StatisticCard 
+              key={index} 
+              label={metric.title} 
+              value={metric.value} 
             />
           ))}
         </div>
 
-        {/* 网络拓扑图 */}
-        <div className="bg-white rounded-lg shadow p-6">
-          <div className="flex justify-between items-center mb-4">
-            <h2 className="text-xl font-semibold text-gray-800">网络拓扑</h2>
-            <div className="text-sm text-gray-500">
-              共 4 个节点 | 4 个连接
-            </div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="md:col-span-2 bg-white rounded-lg shadow p-4 h-[400px]">
+            <h3 className="text-lg font-semibold mb-2">接口调用拓扑</h3>
+            {topology && topology.nodes && topology.edges ? (
+              <NetworkTopology nodes={topology.nodes} edges={topology.edges} />
+            ) : (
+              <div className="text-sm text-gray-500">无拓扑数据</div>
+            )}
           </div>
-          <div className="h-[400px]">
-            <NetworkTopology />
-          </div>
-        </div>
 
-        {/* 图表第一行 */}
-        <div className="grid grid-cols-2 gap-4 mb-4">
-          <div className="bg-white rounded-lg shadow p-4">
-            <div className="flex justify-between items-center mb-4">
-              <h3 className="text-lg font-medium text-gray-700">每分钟平均TPS</h3>
+          <div className="space-y-4">
+            <div className="bg-white rounded-lg shadow p-4 h-[200px]">
+              <div className="flex justify-between items-center mb-1">
+                <h3 className="text-base font-medium">调用量趋势</h3>
+              </div>
+              {timeSeriesData.callVolume?.xAxisData && callVolumeSeries.length > 0 ? (
+                <LineChart 
+                  title="" 
+                  xAxisData={timeSeriesData.callVolume.xAxisData} 
+                  series={callVolumeSeries} // 使用转换后的 series
+                  height="100%" 
+                />
+              ) : <div className="text-sm text-gray-500">无调用量数据</div>}
             </div>
-            <MultiLineChart
-              title=""
-              timeData={timeData}
-              series={tpsData}
-              showLegend={false}
-            />
-          </div>
-          <div className="bg-white rounded-lg shadow p-4">
-            <div className="flex justify-between items-center mb-4">
-              <h3 className="text-lg font-medium text-gray-700">每分钟网络连接数</h3>
+            <div className="bg-white rounded-lg shadow p-4 h-[200px]">
+              <div className="flex justify-between items-center mb-1">
+                <h3 className="text-base font-medium">错误率趋势 (%)</h3>
+              </div>
+              {timeSeriesData.errorRate?.xAxisData && errorRateSeries.length > 0 ? (
+                <LineChart 
+                  title="" 
+                  xAxisData={timeSeriesData.errorRate.xAxisData} 
+                  series={errorRateSeries} // 使用转换后的 series
+                  height="100%" 
+                />
+              ) : <div className="text-sm text-gray-500">无错误率数据</div>}
             </div>
-            <MultiLineChart
-              title=""
-              timeData={timeData}
-              series={connectionData}
-              showLegend={false}
-            />
-          </div>
-        </div>
-
-        {/* 图表第二行 */}
-        <div className="grid grid-cols-2 gap-4">
-          <div className="bg-white rounded-lg shadow p-4">
-            <div className="flex justify-between items-center mb-4">
-              <h3 className="text-lg font-medium text-gray-700">每分钟应用层详情</h3>
-            </div>
-            <MultiLineChart
-              title=""
-              timeData={timeData}
-              series={applicationData}
-              showLegend={true}
-            />
-          </div>
-          <div className="bg-white rounded-lg shadow p-4">
-            <div className="flex justify-between items-center mb-4">
-              <h3 className="text-lg font-medium text-gray-700">每分钟服务安全检测点</h3>
-            </div>
-            <MultiLineChart
-              title=""
-              timeData={timeData}
-              series={securityCheckpointData}
-              showLegend={true}
-            />
           </div>
         </div>
       </div>

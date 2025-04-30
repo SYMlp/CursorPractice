@@ -3,14 +3,14 @@
  * 
  * 提供各种数据转换函数，用于将API返回的数据转换为组件需要的格式
  */
-import { RankItem } from '../mock/asset';
+import { RankingItem } from '../api/index';
 
 /**
  * 转换排行榜数据
  * @param data API返回的原始数据
  * @returns 转换后的排行榜数据
  */
-export function transformRankData(data: any[]): RankItem[] {
+export function transformRankData(data: any[]): RankingItem[] {
   return data.map((item, index) => ({
     id: item.id || index + 1,
     name: item.name || `未命名${index + 1}`,
